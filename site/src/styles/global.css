@@ -21,7 +21,7 @@ a:focus-visible { outline: 3px solid var(--amber); outline-offset: 4px; border-r
 .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
 .site-header { display: flex; align-items: center; justify-content: space-between; padding: 26px 0; }
 .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; font-weight: 800; letter-spacing: -.03em; }
-.brand-mark { width: 30px; height: 30px; border: 1px solid var(--mint); border-radius: 9px; display: grid; place-items: center; color: var(--mint); font-size: 13px; }
+.brand-logo { width: 34px; height: 34px; border-radius: 10px; object-fit: cover; box-shadow: 0 0 0 1px rgba(131,230,180,.2), 0 7px 20px rgba(0,0,0,.22); }
 .header-meta,.section-note { color: var(--muted); font-size: 13px; }
 .hero { padding: 58px 0 30px; border-top: 1px solid var(--line); }
 .eyebrow { margin: 0 0 13px; color: var(--mint); font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }

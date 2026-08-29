@@ -4,6 +4,6 @@ import { reports, reportHref } from '../../lib/reports';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 <BaseLayout title="지난 리포트 | 마켓 렌즈" description="날짜별 미국시장 특징주 분석 리포트 아카이브">
-  <header class="site-header shell"><a class="brand" href={`${base}/`}><span class="brand-mark">ML</span>마켓 렌즈</a><span class="header-meta">Report archive</span></header>
+  <header class="site-header shell"><a class="brand" href={`${base}/`}><img class="brand-logo" src={`${base}/favicon.png`} width="34" height="34" alt="" />마켓 렌즈</a><span class="header-meta">Report archive</span></header>
   <main id="main-content" class="shell archive-page"><p class="eyebrow">Archive</p><h1>지난 시장을<br />다시 읽는 법.</h1><p class="archive-intro">하루의 숫자는 지나가도 당시의 근거와 시장 국면은 다음 판단을 위한 기록으로 남습니다.</p><div class="archive-list">{reports.map((report) => <a href={reportHref(report.metadata.marketDate)}><time>{report.metadata.marketDate}</time><div><strong>Nasdaq {report.nasdaqRegime.current}</strong><span>{report.summary[0]}</span></div><b>리포트 보기 →</b></a>)}</div></main>
 </BaseLayout>

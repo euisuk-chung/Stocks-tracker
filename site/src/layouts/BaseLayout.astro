@@ -10,6 +10,8 @@ const {
   title = '마켓 렌즈',
   description = '미국 시장의 움직임을 초보자 눈높이로 정리하는 일일 리포트',
 } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const faviconUrl = `${base}/favicon.png`;
 ---
 
 <!doctype html>
@@ -17,6 +19,8 @@ const {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/png" href={faviconUrl} />
+    <link rel="apple-touch-icon" href={faviconUrl} />
     <meta name="description" content={description} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
