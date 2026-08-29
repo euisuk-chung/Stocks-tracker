@@ -1,0 +1,19 @@
+.env
+.env.*
+!.env.example
+
+# Local pipeline outputs and caches
+.cache/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.coverage
+build/
+pipeline/build/
+/assets-generated/
+
+# Astro / Node.js
+node_modules/
+site/dist/
+site/.astro/

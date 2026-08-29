@@ -1,0 +1,87 @@
+---
+import TrendChart from './TrendChart';
+import EtfGuide from './EtfGuide.astro';
+import { formatNumber, formatPct, type DailyReport } from '../lib/reports';
+
+interface Props { report: DailyReport; showArchiveLink?: boolean; }
+const { report, showArchiveLink = true } = Astro.props;
+const { metadata, marketPulse, nasdaqRegime, movers } = report;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const maxVolume = Math.max(...report.sectorHeatmap.map((item) => item.dollarVolume));
+const heatColor = (change: number) => {
+  const strength = Math.min(Math.abs(change) / 5, 1);
+  return change >= 0
+    ? `rgba(34, ${Math.round(112 + strength * 75)}, ${Math.round(77 + strength * 42)}, ${0.42 + strength * 0.45})`
+    : `rgba(${Math.round(128 + strength * 105)}, ${Math.round(57 - strength * 18)}, ${Math.round(64 - strength * 10)}, ${0.46 + strength * 0.45})`;
+};
+---
+
+<header class="site-header shell">
+  <a class="brand" href={`${base}/`}><span class="brand-mark">ML</span>마켓 렌즈</a>
+  <nav class="top-nav" aria-label="주요 메뉴">
+    {showArchiveLink && <a href={`${base}/reports/`}>지난 리포트</a>}
+    <span>{metadata.marketDate}</span>
+  </nav>
+</header>
+
+<main id="main-content" class="shell">
+  {metadata.isDemo && <aside class="demo-banner"><strong>데모 리포트</strong> 실제 Alpaca·뉴스 데이터가 연결되면 자동 생성 리포트로 교체됩니다.</aside>}
+  <section class="report-hero">
+    <div><p class="eyebrow">Daily market brief · {metadata.marketDate}</p><h1>오늘 시장에서<br /><span>놓치지 말아야 할 변화</span></h1></div>
+    <div class="regime-panel"><span>Nasdaq 단기 국면</span><strong>{nasdaqRegime.current}</strong><small>{nasdaqRegime.previous} → {nasdaqRegime.current}</small></div>
+  </section>
+
+  <section class="summary-strip" aria-label="오늘의 세 줄 요약">
+    {report.summary.map((line, index) => <article><span>0{index + 1}</span><p>{line}</p></article>)}
+  </section>
+
+  <section class="section" aria-labelledby="pulse-title">
+    <div class="section-head"><div><p class="section-kicker">Market pulse</p><h2 id="pulse-title">시장 한눈에 보기</h2></div><p class="section-note">전 거래일 정규장 종가 대비</p></div>
+    <div class="pulse-grid">{marketPulse.map((market) => <article class="market-card"><div class="market-label"><strong>{market.ticker}</strong><span>{market.name}</span></div><p>{market.tracks}</p><div class="market-price"><div class="value">${formatNumber(market.close)}</div><div class:list={['change', market.changePct >= 0 ? 'up' : 'down']}>{formatPct(market.changePct)}</div></div><small>{market.role}</small></article>)}</div>
+    <div class="regime-copy"><strong>{nasdaqRegime.previous}에서 {nasdaqRegime.current}로</strong><p>{nasdaqRegime.explanation}</p></div>
+  </section>
+
+  <EtfGuide />
+
+  <section class="section" aria-labelledby="heat-title">
+    <div class="section-head"><div><p class="section-kicker">S&P 500 heatmap</p><h2 id="heat-title">오늘의 섹터 온도</h2></div><p class="section-note">타일 크기: 거래대금 · 색상: 등락률</p></div>
+    <div class="live-heatmap" role="list" aria-label="거래대금 가중 섹터 히트맵">
+      {report.sectorHeatmap.map((item) => <div class="live-heat" role="listitem" style={`flex-grow:${Math.max(item.dollarVolume / maxVolume * 9, 1)};background:${heatColor(item.changePct)}`}><small>{item.sector}</small><strong>{item.symbol}</strong><span>{formatPct(item.changePct)}</span></div>)}
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="movers-title">
+    <div class="section-head"><div><p class="section-kicker">Top movers</p><h2 id="movers-title">상승 10 · 하락 10</h2></div><p class="section-note">★ 표시는 심층 조사 대상</p></div>
+    <div class="movers mover-tables">
+      {[{ title: '상승 특징주', rows: movers.gainers, tone: 'up' }, { title: '하락 특징주', rows: movers.losers, tone: 'down' }].map((group) => <article class="mover-panel"><h3 class={group.tone}>{group.title}</h3><div class="table-head"><span>종목</span><span>거래량</span><span>등락률</span></div>{group.rows.map((row) => <div class="mover-row"><div><strong>{row.symbol}{row.deepDive ? ' ★' : ''}</strong><span>{row.name} · {row.sector}</span></div><span>{row.volumeRatio.toFixed(2)}배</span><b class={group.tone}>{formatPct(row.changePct)}</b></div>)}</article>)}
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="deep-title">
+    <div class="section-head"><div><p class="section-kicker">Evidence-backed notes</p><h2 id="deep-title">핵심 6종목 깊게 보기</h2></div><p class="section-note">가격 데이터와 뉴스 근거를 분리해 검수</p></div>
+    <div class="deep-grid">
+      {report.deepDives.map((item) => <article class="deep-card"><div class="deep-card-head"><span class="symbol-chip">{item.symbol}</span><span class="evidence-chip">근거 {item.claimIds.length}개</span></div><h3>{item.headline}</h3><p>{item.explanation}</p><TrendChart points={item.chart} symbol={item.symbol} client:visible /><div class="reading"><strong>차트 읽기</strong><p>{item.chartReading}</p></div><div class="risk"><strong>확인할 위험</strong><p>{item.risk}</p></div></article>)}
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="theme-title">
+    <div class="section-head"><div><p class="section-kicker">Themes</p><h2 id="theme-title">오늘의 주요 테마</h2></div><p class="section-note">근거가 있을 때만 최대 3개</p></div>
+    <div class="theme-grid">{report.themes.map((theme, index) => <article class="theme-card"><span>0{index + 1}</span><h3>{theme.title}</h3><p>{theme.summary}</p><div>{theme.symbols.map((symbol) => <b>{symbol}</b>)}</div></article>)}</div>
+  </section>
+
+  <section class="section" aria-labelledby="income-title">
+    <div class="section-head"><div><p class="section-kicker">Beginner basket</p><h2 id="income-title">ETF·배당주 입문 바스켓</h2></div><p class="section-note">추천이 아닌 상품 구조 비교용 표본</p></div>
+    <div class="basket-grid">{report.incomeBasket.map((item) => <article><div><span>{item.kind}</span><strong>{item.symbol}</strong><em class={item.changePct >= 0 ? 'up' : 'down'}>{formatPct(item.changePct)}</em></div><h3>{item.name}</h3><p>{item.description}</p></article>)}</div>
+  </section>
+
+  <section class="section source-section" aria-labelledby="source-title">
+    <div class="section-head"><div><p class="section-kicker">Sources & QA</p><h2 id="source-title">근거와 검수 상태</h2></div><p class="section-note">{metadata.dataSource}</p></div>
+    <div class="qa-row">{report.qa.reviews.map((review) => <span><i aria-hidden="true"></i>{review.reviewer.replaceAll('_', ' ')} · {review.verdict}</span>)}</div>
+    <ol class="source-list">{report.sources.map((source) => <li><a href={source.url} target="_blank" rel="noreferrer"><strong>{source.publisher}</strong> · {source.title}</a><time>{source.publishedAt.slice(0, 10)}</time></li>)}</ol>
+  </section>
+
+  <section class="education-note"><strong>20일선과 30일선은 이렇게 봅니다</strong><p>가격이 두 선 위에 있는지만 보지 말고, 선의 기울기와 가격과의 거리가 함께 커지는지 살펴보세요. 교차 하나만으로 매매 신호를 단정하지 않습니다.</p></section>
+  {showArchiveLink && <div class="archive-cta"><a href={`${base}/reports/`}>지난 리포트 모두 보기 <span>→</span></a></div>}
+</main>
+
+<footer class="footer"><div class="shell"><strong>마켓 렌즈</strong><span>교육 목적의 시장 정보이며 투자 권유가 아닙니다. 모든 투자 판단과 책임은 이용자에게 있습니다.</span></div></footer>

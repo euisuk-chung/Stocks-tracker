@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://stocks-tracker.local/schemas/review-result.schema.json",
+  "title": "ReviewResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "taskId",
+    "reviewer",
+    "marketDate",
+    "iteration",
+    "verdict",
+    "blockingIssues",
+    "improvements",
+    "checkedItems",
+    "reviewedAt"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "taskId": { "type": "string", "minLength": 1 },
+    "reviewer": {
+      "enum": [
+        "fact_checker",
+        "blog_quality_reviewer",
+        "humanify_reviewer"
+      ]
+    },
+    "marketDate": { "type": "string", "format": "date" },
+    "iteration": { "type": "integer", "minimum": 0, "maximum": 2 },
+    "verdict": { "enum": ["pass", "revise", "block"] },
+    "blockingIssues": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/issue" }
+    },
+    "improvements": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/issue" }
+    },
+    "checkedItems": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "reviewedAt": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "verdict": { "const": "block" } } },
+      "then": { "properties": { "blockingIssues": { "minItems": 1 } } }
+    },
+    {
+      "if": { "properties": { "verdict": { "const": "pass" } } },
+      "then": {
+        "properties": {
+          "blockingIssues": { "maxItems": 0 },
+          "improvements": { "maxItems": 0 }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "verdict": { "const": "revise" } } },
+      "then": {
+        "properties": {
+          "blockingIssues": { "maxItems": 0 },
+          "improvements": { "minItems": 1 }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "references", "suggestedFix"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+        "message": { "type": "string", "minLength": 1 },
+        "references": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "suggestedFix": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

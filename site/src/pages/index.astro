@@ -1,0 +1,9 @@
+---
+import ReportView from '../components/ReportView.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { latestReport } from '../lib/reports';
+---
+
+<BaseLayout title="마켓 렌즈 | 오늘의 미국시장" description="가격과 근거를 분리해 설명하는 초보자용 미국시장 일일 리포트">
+  {latestReport ? <ReportView report={latestReport} /> : <main id="main-content" class="shell empty-state"><p class="eyebrow">Daily market brief</p><h1>첫 리포트를<br />준비하고 있습니다.</h1><p>검증을 통과한 거래일 리포트가 발행되면 이곳에 표시됩니다.</p></main>}
+</BaseLayout>

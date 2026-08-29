@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://stocks-tracker.local/schemas/evidence-batch.schema.json",
+  "title": "EvidenceBatch",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "taskId",
+    "agent",
+    "marketDate",
+    "status",
+    "assignedScopes",
+    "items",
+    "sources",
+    "themeCandidates",
+    "errors"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "taskId": { "type": "string", "minLength": 1 },
+    "agent": {
+      "enum": [
+        "gainer_researcher",
+        "loser_researcher",
+        "market_theme_researcher"
+      ]
+    },
+    "marketDate": { "type": "string", "format": "date" },
+    "status": {
+      "enum": ["complete", "insufficient_evidence", "invalid_input"]
+    },
+    "assignedScopes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "items": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidenceItem" }
+    },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/source" }
+    },
+    "themeCandidates": {
+      "type": "array",
+      "maxItems": 3,
+      "items": { "$ref": "#/$defs/themeCandidate" }
+    },
+    "errors": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "complete" } } },
+      "then": { "properties": { "errors": { "maxItems": 0 } } }
+    },
+    {
+      "if": { "properties": { "status": { "const": "invalid_input" } } },
+      "then": {
+        "properties": {
+          "items": { "maxItems": 0 },
+          "sources": { "maxItems": 0 },
+          "themeCandidates": { "maxItems": 0 },
+          "errors": { "minItems": 1 }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "value"],
+      "properties": {
+        "type": { "enum": ["symbol", "market", "sector", "theme"] },
+        "value": { "type": "string", "minLength": 1 }
+      }
+    },
+    "beginnerTerm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["term", "explanation"],
+      "properties": {
+        "term": { "type": "string", "minLength": 1 },
+        "explanation": { "type": "string", "minLength": 1 }
+      }
+    },
+    "evidenceItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidenceId",
+        "eventKey",
+        "scope",
+        "claim",
+        "eventAt",
+        "marketReactionDate",
+        "sourceIds",
+        "confidence",
+        "priceRelevance",
+        "uncertainty",
+        "beginnerTerms"
+      ],
+      "properties": {
+        "evidenceId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+        "eventKey": { "type": "string", "minLength": 1 },
+        "scope": { "$ref": "#/$defs/scope" },
+        "claim": { "type": "string", "minLength": 1 },
+        "eventAt": { "type": ["string", "null"], "format": "date-time" },
+        "marketReactionDate": { "type": "string", "format": "date" },
+        "sourceIds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "confidence": { "enum": ["confirmed", "supported", "unknown"] },
+        "priceRelevance": { "enum": ["direct", "contextual", "unclear"] },
+        "uncertainty": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "beginnerTerms": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/beginnerTerm" }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "title",
+        "publisher",
+        "url",
+        "publishedAt",
+        "checkedAt",
+        "sourceType",
+        "independenceKey",
+        "primary",
+        "canonicalEventId"
+      ],
+      "properties": {
+        "sourceId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+        "title": { "type": "string", "minLength": 1 },
+        "publisher": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "checkedAt": { "type": "string", "format": "date-time" },
+        "sourceType": {
+          "enum": ["sec", "company_ir", "government", "exchange", "news", "other"]
+        },
+        "independenceKey": { "type": "string", "minLength": 1 },
+        "primary": { "type": "boolean" },
+        "canonicalEventId": { "type": ["string", "null"], "minLength": 1 }
+      }
+    },
+    "themeCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "summary", "evidenceIds", "symbols"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 },
+        "evidenceIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "symbols": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

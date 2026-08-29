@@ -1,0 +1,49 @@
+---
+import { etfFamilies, etfGuideVerifiedAt, lookAlikeWarnings } from '../data/etf-guide';
+---
+
+<section class="section etf-guide" aria-labelledby="etf-guide-title">
+  <div class="section-head">
+    <div><p class="section-kicker">ETF field guide</p><h2 id="etf-guide-title">이름 말고, 안에 든 지수부터</h2></div>
+    <p class="section-note">공식 자료 확인일 {etfGuideVerifiedAt}</p>
+  </div>
+
+  <div class="etf-principle">
+    <div><span>01</span><strong>무슨 지수인가?</strong><p>SPY와 QQQ의 가장 큰 차이는 운용사가 아니라 담는 기업 집합입니다.</p></div>
+    <div><span>02</span><strong>같은 지수인가?</strong><p>QQQ·QQQM처럼 같은 지수라면 그다음에 보수와 거래 조건을 봅니다.</p></div>
+    <div><span>03</span><strong>구조가 다른가?</strong><p>레버리지·인버스·옵션형은 이름이 비슷해도 장기 움직임이 전혀 다를 수 있습니다.</p></div>
+  </div>
+
+  <div class="etf-family-grid">
+    {etfFamilies.map((family) => (
+      <article class="etf-family" id={`guide-${family.familyId}`}>
+        <header><div><span>추종 지수</span><h3>{family.indexName}</h3></div><p>{family.plainDescription}</p></header>
+        <p class="family-risk"><strong>먼저 알 점</strong>{family.concentration}</p>
+        <div class="fund-table" role="table" aria-label={`${family.indexName} ETF 비교`}>
+          <div class="fund-table-head" role="row"><span>상품</span><span>연 보수</span><span>핵심 차이</span></div>
+          {family.funds.map((fund) => (
+            <div class="fund-row" role="row">
+              <div role="cell"><a href={fund.sourceUrl} target="_blank" rel="noreferrer"><strong>{fund.ticker}</strong><span>{fund.name}</span></a><small>{fund.inception}년 출시</small></div>
+              <b role="cell">{fund.expenseRatio}</b>
+              <div role="cell"><p>{fund.distinction}</p><small>{fund.comparisonUse}</small></div>
+            </div>
+          ))}
+        </div>
+      </article>
+    ))}
+  </div>
+
+  <aside class="fee-example">
+    <div><span>10,000달러를 1년 보유한다고 단순 계산하면</span><strong>QQQ $18 ↔ QQQM $15</strong></div>
+    <p>공시 보수만 비교한 약식 예시입니다. 실제 수익에는 가격 움직임, 추적 오차, 매매 스프레드, 세금과 환율 등이 함께 작용합니다.</p>
+  </aside>
+
+  <div class="look-alike">
+    <div class="look-alike-intro"><p class="section-kicker">Similar ticker, different product</p><h3>QQQ가 들어간다고 같은 ETF는 아닙니다</h3><p>티커의 글자보다 ‘지수 이름’과 ‘일간 목표’ 문구를 먼저 확인하세요.</p></div>
+    <div class="warning-list">
+      {lookAlikeWarnings.map((item) => <a href={item.sourceUrl} target="_blank" rel="noreferrer"><span>{item.tickers}</span><div><strong>{item.label}</strong><p>{item.description}</p></div><b aria-hidden="true">↗</b></a>)}
+    </div>
+  </div>
+
+  <p class="guide-disclaimer">보수는 변경될 수 있습니다. 매수 판단표가 아니라 상품설명서에서 무엇을 비교할지 익히는 교육용 안내입니다.</p>
+</section>
