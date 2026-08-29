@@ -5,6 +5,8 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
+from dotenv import find_dotenv, load_dotenv
+
 
 DEFAULT_MARKET_ETFS = ("SPY", "QQQ", "DIA", "IWM")
 DEFAULT_ETP_BASKET = ("SPY", "QQQ", "SCHD", "VYM", "DGRO", "JEPI")
@@ -34,6 +36,9 @@ class PipelineConfig:
 
     @classmethod
     def from_env(cls, *, require_credentials: bool = True) -> "PipelineConfig":
+        dotenv_path = find_dotenv(usecwd=True)
+        if dotenv_path:
+            load_dotenv(dotenv_path, override=False)
         key = os.getenv("ALPACA_API_KEY") or os.getenv("APCA_API_KEY_ID")
         secret = os.getenv("ALPACA_SECRET_KEY") or os.getenv("APCA_API_SECRET_KEY")
         if require_credentials and (not key or not secret):
@@ -60,7 +65,7 @@ def load_universe(path: Path) -> tuple[SecurityDefinition, ...]:
             raise ValueError("Universe CSV must contain symbol,name,sector columns")
         seen: set[str] = set()
         for row in reader:
-            symbol = row["symbol"].strip().upper().replace(".", "-")
+            symbol = row["symbol"].strip().upper()
             if not symbol or symbol in seen:
                 continue
             seen.add(symbol)

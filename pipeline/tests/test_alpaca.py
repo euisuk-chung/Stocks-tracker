@@ -72,8 +72,9 @@ def test_retries_http_429_with_backoff() -> None:
 
 def test_non_retryable_http_error_fails_immediately() -> None:
     def opener(request: object, timeout: float) -> FakeResponse:
-        raise urllib.error.HTTPError("url", 401, "unauthorized", {}, io.BytesIO())
+        body = io.BytesIO(json.dumps({"message": "invalid credentials"}).encode())
+        raise urllib.error.HTTPError("url", 401, "unauthorized", {}, body)
 
     client = AlpacaClient("key", "secret", opener=opener)
-    with pytest.raises(AlpacaError, match="401"):
+    with pytest.raises(AlpacaError, match="401: invalid credentials"):
         client.get_daily_bars(("AAA",), start=date(2026, 8, 1), end=date(2026, 8, 29))

@@ -7,7 +7,7 @@ name = "market-tracker-pipeline"
 version = "0.1.0"
 description = "Deterministic market-data pipeline for the US market daily report"
 requires-python = ">=3.11"
-dependencies = ["tzdata>=2025.2"]
+dependencies = ["python-dotenv>=1.1", "tzdata>=2025.2"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8.3", "pytest-cov>=6.0"]

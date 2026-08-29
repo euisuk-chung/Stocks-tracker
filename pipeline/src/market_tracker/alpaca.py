@@ -62,7 +62,9 @@ class AlpacaClient:
             except urllib.error.HTTPError as exc:
                 retryable = exc.code == 429 or 500 <= exc.code < 600
                 if not retryable or attempt >= self.max_retries:
-                    raise AlpacaError(f"Alpaca request failed with HTTP {exc.code}") from exc
+                    detail = _http_error_detail(exc)
+                    suffix = f": {detail}" if detail else ""
+                    raise AlpacaError(f"Alpaca request failed with HTTP {exc.code}{suffix}") from exc
                 retry_after = exc.headers.get("Retry-After") if exc.headers else None
                 delay = float(retry_after) if retry_after else 2**attempt
                 self._sleeper(delay)
@@ -129,3 +131,16 @@ def _parse_bar(symbol: str, raw: dict[str, Any]) -> Bar:
         volume=int(raw["v"]),
         vwap=float(raw["vw"]) if raw.get("vw") is not None else None,
     )
+
+
+def _http_error_detail(exc: urllib.error.HTTPError) -> str | None:
+    """Return Alpaca's public error message without exposing request headers."""
+    try:
+        raw = exc.read(4096)
+        payload = json.loads(raw.decode("utf-8"))
+    except (AttributeError, UnicodeDecodeError, json.JSONDecodeError, OSError):
+        return None
+    if not isinstance(payload, dict):
+        return None
+    message = payload.get("message")
+    return str(message)[:500] if message else None

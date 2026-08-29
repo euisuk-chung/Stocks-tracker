@@ -38,7 +38,7 @@ cd site
 npm ci
 ```
 
-`.env.example`을 참고해 값을 운영체제 환경 변수나 Codex 프로젝트의 로컬 환경에 등록합니다. 파이프라인은 `.env` 파일을 자동으로 읽지 않습니다.
+`.env.example`을 저장소 루트의 `.env`로 복사해 값을 입력합니다. 파이프라인은 실행할 때 이 파일을 자동으로 읽으며, 이미 설정된 프로세스 환경 변수가 있으면 그 값을 우선합니다. `.env`는 Git에서 제외되며 커밋하거나 공유하지 않습니다.
 
 ```text
 APCA_API_KEY_ID=...
@@ -49,7 +49,7 @@ ALPACA_FEED=iex
 
 ## 데이터 파이프라인
 
-S&P 500 구성 종목은 공개 구성표에서 갱신해 7일 동안 로컬 캐시합니다. 점(.) 티커는 Alpaca 형식의 하이픈으로 정규화합니다.
+S&P 500 구성 종목은 공개 구성표에서 갱신해 7일 동안 로컬 캐시합니다. `BRK.B`, `BF.B` 같은 클래스 주식 티커는 Alpaca가 요구하는 점 표기를 유지합니다.
 
 ```powershell
 python -m market_tracker refresh-universe

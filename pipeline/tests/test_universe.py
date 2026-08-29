@@ -23,7 +23,7 @@ def test_parse_sp500_constituent_table() -> None:
     definitions = parse_sp500_html(constituent_html())
 
     assert len(definitions) == 500
-    assert definitions[0] == SecurityDefinition("ABC-0", "Company 0", "Technology")
+    assert definitions[0] == SecurityDefinition("ABC.0", "Company 0", "Technology")
 
 
 def test_parser_rejects_incomplete_table() -> None:

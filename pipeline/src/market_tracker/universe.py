@@ -74,7 +74,7 @@ def parse_sp500_html(html: str) -> tuple[SecurityDefinition, ...]:
     for row in parser.rows[1:]:
         if len(row) <= max(symbol_index, name_index, sector_index):
             continue
-        symbol = row[symbol_index].strip().upper().replace(".", "-")
+        symbol = row[symbol_index].strip().upper()
         if symbol:
             definitions.append(
                 SecurityDefinition(
