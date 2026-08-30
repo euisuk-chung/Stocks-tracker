@@ -9,6 +9,7 @@ from .models import (
     DailyReport,
     EvidenceLedger,
     EvidenceLevel,
+    LeadPointRole,
     MarketSnapshot,
     ReviewVerdict,
     SCHEMA_VERSION,
@@ -115,6 +116,17 @@ def validate_report(
         errors.append("report snapshotHash does not match snapshot inputHash")
     if len(report.market_pulse) != 3:
         errors.append("report marketPulse must contain exactly 3 lines")
+    if not report.lead_story.headline.strip() or not report.lead_story.takeaway.strip():
+        errors.append("report leadStory headline and takeaway are required")
+    if report.lead_story.headline.strip() == "오늘 시장에서 놓치지 말아야 할 변화":
+        errors.append("report leadStory headline must be specific to the market date")
+    lead_roles = [item.role for item in report.lead_story.supporting_points]
+    if len(lead_roles) != 3 or set(lead_roles) != set(LeadPointRole):
+        errors.append("report leadStory must contain market, sector, and catalyst support exactly once")
+    if any(item.claim_ids for item in report.lead_story.supporting_points if item.role != LeadPointRole.CATALYST):
+        errors.append("report market and sector lead points must not contain causal claimIds")
+    if len(report.next_watch) < 1 or len(report.next_watch) > 3:
+        errors.append("report nextWatch must contain between 1 and 3 items")
     if len(report.movers) != 20:
         errors.append("report must contain exactly 20 movers")
 
@@ -131,6 +143,8 @@ def validate_report(
     ledger_claims = {item.claim_id for item in ledger.evidence}
     used_claims = {claim for mover in report.movers for claim in mover.claim_ids}
     used_claims.update(claim for theme in report.themes for claim in theme.claim_ids)
+    used_claims.update(claim for point in report.lead_story.supporting_points for claim in point.claim_ids)
+    used_claims.update(claim for item in report.next_watch for claim in item.claim_ids)
     unknown_claims = used_claims - ledger_claims
     if unknown_claims:
         errors.append(f"report references unknown claimIds: {', '.join(sorted(unknown_claims))}")
@@ -180,7 +194,7 @@ def validate_json_contract(document: dict, kind: str) -> tuple[str, ...]:
     required: dict[str, tuple[str, ...]] = {
         "snapshot": ("schemaVersion", "marketDate", "capturedAt", "gainers", "losers", "inputHash"),
         "ledger": ("schemaVersion", "marketDate", "sources", "evidence", "themes"),
-        "report": ("metadata", "marketPulse", "nasdaqRegime", "movers", "marketEtfs", "incomeBasket", "sources", "reviews", "qa", "disclaimer"),
+        "report": ("metadata", "leadStory", "marketPulse", "nasdaqRegime", "movers", "marketEtfs", "incomeBasket", "sources", "reviews", "qa", "nextWatch", "disclaimer"),
         "review": ("reviewer", "verdict", "blockingIssues", "improvements", "checkedItems", "reviewedAt"),
     }
     if kind not in required:

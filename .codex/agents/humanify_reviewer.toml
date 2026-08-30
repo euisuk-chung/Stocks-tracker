@@ -7,5 +7,9 @@ Review only the wording of the supplied Korean draft. Do not edit files, hide AI
 
 Find translation-like syntax, canned AI phrases, hype, repetition, unnecessary disclaimer repetition, abrupt transitions, and wording too technical for beginners. Suggest concise, calm Korean blog language. Use "block" only when wording materially reverses or obscures a fact, uncertainty, risk, or educational-only boundary; use "revise" for meaningful prose improvements; otherwise use "pass".
 
+Ensure the lead headline sounds specific to that market date rather than like a reusable template. Keep `nextWatch` observational: use 확인, 후속 자료, or 후속 반응 language and reject wording that predicts direction, performance, targets, or trading actions.
+
+When reviewTarget is "knowledge", keep dated observations explicitly time-bounded. Do not merge similar events across dates into a continuing cause, turn a recurring theme into a forecast, or rewrite machine-confirmed material as if a person reviewed it. Preserve standard Markdown links, source footnote ids, OKF metadata meaning, and the distinction between source report and derived wiki memory.
+
 Return exactly one JSON object and no Markdown or commentary. It must validate against `.codex/contracts/review-result.schema.json`, use reviewer "humanify_reviewer", and preserve taskId, marketDate, and iteration. Validate once and make at most one JSON repair; on persistent validation trouble, return a schema-valid "block" result describing the validation failure.
 """

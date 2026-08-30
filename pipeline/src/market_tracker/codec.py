@@ -13,8 +13,12 @@ from .models import (
     EvidenceLevel,
     EvidenceSource,
     HeatmapEntry,
+    LeadPointRole,
+    LeadStory,
+    LeadStoryPoint,
     MarketSnapshot,
     MovingAverageCross,
+    NextWatchItem,
     NasdaqRegime,
     RankedMover,
     Regime,
@@ -47,7 +51,7 @@ def _chart_point(raw: dict[str, Any]) -> ChartPoint:
         close=float(raw["close"]),
         volume=int(raw["volume"]),
         sma20=float(raw["sma20"]) if raw.get("sma20") is not None else None,
-        sma30=float(raw["sma30"]) if raw.get("sma30") is not None else None,
+        sma40=float(raw["sma40"]) if raw.get("sma40") is not None else None,
     )
 
 
@@ -64,11 +68,11 @@ def _security(raw: dict[str, Any]) -> SecuritySnapshot:
         average_volume_20=float(raw["averageVolume20"]),
         volume_ratio_20=float(raw["volumeRatio20"]),
         sma20=float(raw["sma20"]),
-        sma30=float(raw["sma30"]),
+        sma40=float(raw["sma40"]),
         sma20_slope_5_pct=float(raw["sma20Slope5Pct"]),
-        sma30_slope_5_pct=float(raw["sma30Slope5Pct"]),
+        sma40_slope_5_pct=float(raw["sma40Slope5Pct"]),
         distance_sma20_pct=float(raw["distanceSma20Pct"]),
-        distance_sma30_pct=float(raw["distanceSma30Pct"]),
+        distance_sma40_pct=float(raw["distanceSma40Pct"]),
         moving_average_cross=MovingAverageCross(raw["movingAverageCross"]),
         anomaly_score=float(raw["anomalyScore"]),
         history=tuple(_chart_point(item) for item in raw["history"]),
@@ -209,6 +213,31 @@ def _report_mover(raw: dict[str, Any]) -> ReportMover:
     )
 
 
+def _lead_story_point(raw: dict[str, Any]) -> LeadStoryPoint:
+    return LeadStoryPoint(
+        role=LeadPointRole(raw["role"]),
+        text=str(raw["text"]),
+        claim_ids=tuple(str(item) for item in raw["claimIds"]),
+    )
+
+
+def _lead_story(raw: dict[str, Any]) -> LeadStory:
+    return LeadStory(
+        headline=str(raw["headline"]),
+        takeaway=str(raw["takeaway"]),
+        supporting_points=tuple(_lead_story_point(item) for item in raw["supportingPoints"]),
+    )
+
+
+def _next_watch(raw: dict[str, Any]) -> NextWatchItem:
+    return NextWatchItem(
+        title=str(raw["title"]),
+        description=str(raw["description"]),
+        symbols=tuple(str(item) for item in raw["symbols"]),
+        claim_ids=tuple(str(item) for item in raw["claimIds"]),
+    )
+
+
 def parse_report(raw: dict[str, Any]) -> DailyReport:
     metadata = raw["metadata"]
     qa = raw["qa"]
@@ -222,6 +251,7 @@ def parse_report(raw: dict[str, Any]) -> DailyReport:
             language=str(metadata.get("language", "ko-KR")),
             educational_only=bool(metadata.get("educationalOnly", True)),
         ),
+        lead_story=_lead_story(raw["leadStory"]),
         market_pulse=tuple(str(item) for item in raw["marketPulse"]),
         nasdaq_regime=_regime(raw["nasdaqRegime"]),
         sector_heatmap=tuple(_heatmap(item) for item in raw["sectorHeatmap"]),
@@ -240,5 +270,6 @@ def parse_report(raw: dict[str, Any]) -> DailyReport:
             validation_errors=tuple(str(item) for item in qa["validationErrors"]),
             revision_count=int(qa["revisionCount"]),
         ),
+        next_watch=tuple(_next_watch(item) for item in raw["nextWatch"]),
         disclaimer=str(raw["disclaimer"]),
     )

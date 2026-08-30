@@ -13,7 +13,7 @@
 - 거래대금 가중 섹터 히트맵
 - 근거가 확인된 시장 테마 최대 3개
 - ETF/ETP와 배당주 입문 바스켓
-- 3개월 가격·20일선·30일선 차트와 초보자용 해설
+- 3개월 가격·1개월선(20거래일)·2개월선(40거래일) 차트와 초보자용 해설
 
 서비스는 투자 추천 시스템이 아닙니다. 가격 계산과 종목 선정은 재현 가능한 Python 코드가 담당하고, LLM은 뉴스 근거 조사, 설명 작성, 사실·문장 품질 검수에만 사용합니다.
 
@@ -35,7 +35,8 @@ flowchart LR
     Draft --> Reviewers[검수 서브에이전트 3개]
     Reviewers --> Orchestrator
     Orchestrator --> Validator[최종 검증기]
-    Validator --> Publisher[발행 스크립트]
+    Validator --> Knowledge[OKF 지식 변환·검증]
+    Knowledge --> Publisher[발행 스크립트]
     Publisher --> ReportsBranch[(reports 브랜치)]
     MainBranch[(main 브랜치)] --> Actions[GitHub Actions]
     ReportsBranch --> Actions
@@ -49,6 +50,7 @@ flowchart LR
 3. **파일 작성자는 오케스트레이터 하나뿐입니다.** 서브에이전트 여섯 개는 모두 읽기 전용입니다.
 4. **발행 여부는 검증기가 결정합니다.** 초안 작성자의 판단만으로는 게시할 수 없습니다.
 5. **웹은 정적 결과만 제공합니다.** API 키, 원시 조사 로그, 런타임 에이전트 기능은 브라우저 번들에 포함되지 않습니다.
+6. **OKF 위키는 파생 기억입니다.** 이전 보고서와 위키는 탐색에만 쓰며 현재 거래일의 새로운 원인 근거로 재사용하지 않습니다.
 
 ## 3. 저장소 구조
 
@@ -61,7 +63,7 @@ flowchart LR
 │  ├─ config.toml             # 동시 실행 수 등 프로젝트 에이전트 설정
 │  └─ ORCHESTRATION.md        # 단일 작성자·Loop 상한·신뢰 경계 계약
 ├─ pipeline/
-│  ├─ src/market_tracker/     # 수집, 계산, 정규화, 검증, CLI
+│  ├─ src/market_tracker/     # 수집, 계산, 정규화, JSON/OKF 검증, CLI
 │  ├─ tests/                  # 계산·계약·Loop·발행 게이트 테스트
 │  └─ fixtures/               # 결정론적 데모 리포트
 ├─ scripts/
@@ -74,6 +76,8 @@ flowchart LR
 └─ .github/workflows/
    └─ deploy-pages.yml        # main 코드와 reports 데이터를 결합해 배포
 ```
+
+`agents/`의 여섯 역할은 한 파일당 한 에이전트인 프로젝트 범위 TOML로 Git에 저장됩니다. 모두 읽기 전용이며 모델과 추론 수준은 고정하지 않아 예약 작업의 상위 설정을 상속합니다. 따라서 재배포 시에는 `.codex/` 디렉터리 전체를 함께 공유하면 역할, JSON 계약, 실행 상한과 예약 프롬프트가 같은 버전으로 이동합니다.
 
 ## 4. 일일 실행 생명주기
 
@@ -98,7 +102,7 @@ Python 파이프라인이 Alpaca에서 최근 일봉을 수집하고 `MarketSnap
 - 종가 및 전일 대비 등락률
 - 종가 × 거래량으로 계산한 거래대금
 - 직전 20거래일 평균 거래량 대비 당일 거래량 배수
-- 20일·30일 단순이동평균선
+- 1개월(20거래일)·2개월(40거래일) 단순이동평균선
 - 각 이동평균의 5거래일 기울기와 현재가 이격률
 - 골든/데드 크로스 여부
 - `abs(등락률) × max(거래량 배수, 1)` 기반 이상치 점수
@@ -142,7 +146,9 @@ Python 파이프라인이 Alpaca에서 최근 일봉을 수집하고 `MarketSnap
 
 ### Loop 4 — 단일 작성자 초안
 
-오케스트레이터만 `DailyReport`를 작성합니다. 숫자는 `MarketSnapshot`, 변동 원인과 테마는 `EvidenceLedger`에서만 가져옵니다. 차트 해설은 가격과 이동평균선의 위치·기울기·교차·이격을 관찰하는 방식으로 작성하며 매수·매도 신호로 단정하지 않습니다.
+오케스트레이터만 `DailyReport`를 작성합니다. 작성 전 저장소 공통 Skill인 `.agents/skills/market-report-composer/SKILL.md`와 두 reference를 읽어 날짜별 핵심 메시지와 편집 순서를 동일하게 적용합니다. 숫자는 `MarketSnapshot`, 변동 원인과 테마는 `EvidenceLedger`에서만 가져옵니다. 차트 해설은 가격과 이동평균선의 위치·기울기·교차·이격을 관찰하는 방식으로 작성하며 매수·매도 신호로 단정하지 않습니다.
+
+발행 본문의 순서는 `오늘의 결론 → 시장 구조 → 근거 테마 → 특징주 → 심층분석 → 다음 거래일 관찰 항목 → 품질·학습 부록`입니다. `leadStory`는 거래일에 특화된 제목과 한 문장 결론, `market`, `sector`, `catalyst` 역할을 하나씩 갖는 세 지지 근거로 구성됩니다. `nextWatch`는 예측이나 거래 지시가 아닌 확인 가능한 관찰 항목 1~3개입니다. ETF 상품 비교와 이동평균선 입문 설명 같은 상시 학습 내용은 본문의 흐름을 끊지 않도록 위키에 둡니다.
 
 ### Loop 5 — 병렬 검수
 
@@ -165,6 +171,20 @@ Python 파이프라인이 Alpaca에서 최근 일봉을 수집하고 `MarketSnap
 - `fact_checker=pass`이고 다른 두 검수에 `block`이 없어야 통과
 
 한도를 넘거나 차단 문제가 남으면 그날 리포트를 발행하지 않습니다. 실패 진단은 `build/<marketDate>/failure/`에 보존하고 이전 정상 리포트는 그대로 유지합니다.
+
+### Loop 7 — LLM Wiki·OKF 지식 컴파일
+
+검증된 `DailyReport JSON` 전체에서 OKF v0.2 Bundle을 결정론적으로 다시 만듭니다.
+
+- 날짜별 보고서 개념은 발행 후 불변으로 유지
+- 종목 페이지는 특징주 등장 날짜와 당시 설명을 연결한 타임라인
+- 테마 페이지는 같은 `themeId`가 등장한 검증 보고서를 연결
+- ETF·ETP, 금융용어, 이동평균선·특징주 선정·Nasdaq 국면 계산 방법을 별도 개념으로 관리
+- `index.md`를 통한 단계적 탐색, `log.md`를 통한 날짜별 변경 추적
+- `generated`, `verified`, `status`, `sources`로 생성 주체·신뢰·생명주기·원본 표시
+- `catalog.json`은 Astro가 정적 위키 화면을 만들기 위한 파생 인덱스
+
+기본 변환은 LLM 없이 실행합니다. 누적 페이지에 자유 형식 종합 문장을 추가하는 경우에만 기존 세 검수 에이전트를 `reviewTarget=knowledge`로 다시 실행하며 지식 수정·재검수는 최대 1회입니다. `fact_checker`는 원본 보고서 추적성과 역사적 사실 불변성을, `blog_quality_reviewer`는 index·백링크·초보자 탐색 구조를, `humanify_reviewer`는 날짜가 다른 사건을 지속 원인처럼 합치지 않는 표현을 검사합니다.
 
 ## 5. 핵심 데이터 계약
 
@@ -196,7 +216,7 @@ flowchart LR
 
 ### `DailyReport`
 
-시장 3줄 요약, 특징주 20개, 심층분석 6개, 시장 ETF, 입문 바스켓, 테마, 출처, 세 검수 결과와 QA 상태를 포함하는 유일한 발행 단위입니다.
+날짜별 `leadStory`, 시장 3줄 요약, 특징주 20개, 심층분석 6개, 시장 ETF, 입문 바스켓, 테마, `nextWatch`, 출처, 세 검수 결과와 QA 상태를 포함하는 유일한 발행 단위입니다. `marketPulse`는 하위 호환용 수치 요약으로 남지만 독자가 처음 만나는 메시지는 `leadStory`입니다.
 
 ### 발행 게이트의 주요 불변 조건
 
@@ -204,6 +224,8 @@ flowchart LR
 - QQQ 및 SPY·QQQ·DIA·IWM 데이터 존재
 - 모든 리포트 수치와 순위가 Snapshot과 일치
 - 모든 `claimId`와 `sourceId`가 Ledger에 등록
+- `leadStory`가 시장·섹터·촉매 지지 근거를 정확히 하나씩 포함하고 일반적인 고정 제목을 사용하지 않음
+- `nextWatch`가 1~3개이며 예측을 사실처럼 단정하지 않음
 - 출처 URL과 7일 범위, 사건/반응 시점, 독립성 규칙 충족
 - 검수 결과가 정확히 3개이며 `fact_checker=pass`
 - 수정 횟수 0~2회, `qa.publishable=true`
@@ -219,11 +241,31 @@ flowchart LR
 - `/reports/`: 날짜별 아카이브
 - `/reports/YYYY-MM-DD/`: 개별 리포트
 
-ETF 비교 가이드는 시세 카드와 별도로 운용합니다. SPY/VOO/IVV처럼 같은 지수를 추종하는 상품의 차이와 QQQ/QQQM처럼 운용 목적이 다른 유사 상품을 초보자가 구분할 수 있도록 정적 설명 데이터를 제공합니다. 일일 시세는 리포트 JSON에서, 상품 성격 설명은 `site/src/data/etf-guide.ts`에서 가져옵니다.
+ETF 비교 가이드는 일일 리포트 본문이 아니라 위키의 상시 학습 자료로 운용합니다. SPY/VOO/IVV처럼 같은 지수를 추종하는 상품의 차이와 QQQ/QQQM처럼 운용 목적이 다른 유사 상품을 초보자가 구분할 수 있도록 정적 설명 데이터를 제공합니다. 일일 시세는 리포트 JSON에서, 상품 성격 설명은 `site/src/data/etf-guide.ts`에서 가져옵니다.
 
 GitHub Pages의 저장소 하위 경로에서도 동작하도록 운영 빌드의 base path를 `/Stocks-tracker`로 설정합니다.
 
-## 7. 발행과 배포
+## 7. 지식 Bundle과 웹 탐색
+
+`reports` 브랜치는 검증 JSON과 `knowledge/` OKF Bundle을 함께 보관합니다.
+
+```text
+reports 브랜치
+├─ index.json
+├─ reports/YYYY-MM-DD.json       # 원본
+└─ knowledge/
+   ├─ index.md · log.md · catalog.json
+   ├─ daily/YYYY/MM/YYYY-MM-DD.md
+   ├─ symbols/*.md
+   ├─ themes/*.md
+   ├─ instruments/*.md
+   ├─ glossary/*.md
+   └─ methodology/*.md
+```
+
+웹은 `/wiki/`, `/wiki/symbols/{ticker}/`, `/wiki/themes/{themeId}/`, `/wiki/concepts/.../` 경로를 제공합니다. 각 화면에는 자동 검증 상태, 날짜별 원본 보고서 링크와 OKF Markdown 원문 링크가 표시됩니다.
+
+## 8. 발행과 배포
 
 발행 데이터와 애플리케이션 코드는 서로 다른 브랜치에 둡니다.
 
@@ -251,7 +293,7 @@ Astro/React/Python 코드             reports/YYYY-MM-DD.json
 
 배포 워크플로는 항상 `main`의 사이트 코드를 checkout한 뒤 `reports` 브랜치의 발행 데이터만 가져와 빌드합니다. 빌드나 Pages 배포가 실패하면 새 결과가 활성화되지 않으므로 이전 정상 사이트가 유지됩니다. 저장소의 Pages Source는 **GitHub Actions**로 활성화되어 있어야 합니다.
 
-## 8. 실패·재시도 전략
+## 9. 실패·재시도 전략
 
 | 실패 지점 | 처리 |
 |---|---|
@@ -261,36 +303,39 @@ Astro/React/Python 코드             reports/YYYY-MM-DD.json
 | 에이전트 JSON 계약 오류 | 동일 에이전트에 형식 보정 1회 요청 |
 | 근거 부족 | `unknown` 또는 단일 촉매 없음으로 유지 |
 | 검수 차단 | 한도 안에서 수정·재검수, 이후 안전한 실패 |
+| OKF YAML·링크·출처·카탈로그 오류 | JSON과 함께 새 발행 차단, 이전 Bundle 유지 |
 | 동일 SHA-256 리포트 | 변경 없는 정상 종료 |
 | 사이트 빌드·배포 실패 | 기존 Pages 결과 유지 |
 
 이 구조는 성공할 때까지 무한 반복하는 대신 모든 경로가 `published`, `no-op`, `failed` 중 하나로 끝나도록 설계되어 있습니다.
 
-## 9. 보안과 콘텐츠 안전
+## 10. 보안과 콘텐츠 안전
 
 - 자격 증명은 Git에서 제외된 저장소 루트 `.env` 또는 프로세스 환경 변수로만 전달하며, 명시적인 프로세스 환경 변수를 우선합니다.
 - API 키를 에이전트 프롬프트, 산출물, Git, 브라우저 번들에 넣지 않습니다.
 - 웹페이지, 뉴스, 첨부 문서의 텍스트는 근거 데이터일 뿐 실행 지시로 취급하지 않습니다.
+- OKF와 이전 보고서는 탐색용 파생 데이터이며 현재 거래일의 독립 출처로 취급하지 않습니다.
 - 조사·검수 에이전트는 `sandbox_mode="read-only"`, `approval_policy="never"`입니다.
 - 발행 직전에 Alpaca/GitHub/AWS/개인키 패턴을 다시 탐지합니다.
 - 매수·매도·보유, 목표가, 포지션 크기 같은 개인화 투자 조언을 생성하지 않습니다.
 
-## 10. 테스트 전략
+## 11. 테스트 전략
 
 Python 테스트는 다음 경계를 중심으로 구성됩니다.
 
 - 거래일과 최신 완료 세션 계산
 - Alpaca 페이지네이션, 배치, 재시도, 오류 변환
-- 등락률, 거래량 배수, 20/30일선, 기울기, 이격률
+- 등락률, 거래량 배수, 1개월/2개월 이동평균선, 기울기, 이격률
 - 상승·하락 순위, 동률, 결측치, 심층 종목 선정
 - 7일 근거 범위, 재전송 기사, 출처 독립성, 시간 순서
 - 미등록 `claimId`, 변조된 원본 수치, 누락된 검수 결과 차단
 - 추가 조사 1회와 수정 2회의 Loop 상한
-- CLI 계약과 최종 발행 가능 여부
+- 지식 수정 1회 상한, OKF YAML·링크·출처 각주·catalog 검증
+- CLI 계약과 JSON+OKF 최종 발행 가능 여부
 
 프런트엔드는 정적 빌드 성공을 기본 게이트로 사용합니다. 배포 전에는 3개월 차트, 이동평균선, 히트맵, 모바일 레이아웃, 키보드 탐색과 출처 링크를 브라우저에서 확인합니다.
 
-## 11. 주요 설계 결정
+## 12. 주요 설계 결정
 
 | 결정 | 이유 | 트레이드오프 |
 |---|---|---|
@@ -301,8 +346,9 @@ Python 테스트는 다음 경계를 중심으로 구성됩니다.
 | 유한 Loop | 비용·시간 예측과 무한 반복 방지 | 한도 내 해결되지 않으면 발행을 포기함 |
 | 정적 사이트 | 낮은 운영비와 작은 공격 표면 | 실시간 개인화·서버 기능을 제공하지 않음 |
 | 코드/리포트 브랜치 분리 | 배포 데이터와 개발 이력의 독립성 | Actions에서 두 브랜치를 결합해야 함 |
+| JSON 원본 + OKF 파생 계층 | 수치 검증력을 유지하면서 보고서 간 지식 연결 | 변환기와 두 형식의 일관성 검증이 필요함 |
 
-## 12. 운영 전제
+## 13. 운영 전제
 
 - Python 3.11 이상, Node.js 22 이상, PowerShell 7.5 이상, Git
 - 저장소 루트 `.env`에 등록된 유효한 Alpaca 데이터 API 자격 증명

@@ -93,6 +93,28 @@ function Assert-ValidatedReport {
         throw 'The report must contain qa.publishable=true.'
     }
 
+    $leadStory = Get-PropertyValue -Object $Report -Name 'leadStory'
+    $headline = [string] (Get-PropertyValue -Object $leadStory -Name 'headline')
+    $takeaway = [string] (Get-PropertyValue -Object $leadStory -Name 'takeaway')
+    $supportingPoints = @(Get-PropertyValue -Object $leadStory -Name 'supportingPoints')
+    if ([string]::IsNullOrWhiteSpace($headline) -or [string]::IsNullOrWhiteSpace($takeaway)) {
+        throw 'The report must contain a date-specific leadStory headline and takeaway.'
+    }
+    if ($headline -eq '오늘 시장에서 놓치지 말아야 할 변화') {
+        throw 'The leadStory headline must describe the actual market date.'
+    }
+    $leadRoles = @($supportingPoints | ForEach-Object { [string] (Get-PropertyValue -Object $_ -Name 'role') })
+    if ($supportingPoints.Count -ne 3 -or
+        @($leadRoles | Sort-Object -Unique).Count -ne 3 -or
+        @($leadRoles | Where-Object { $_ -notin @('market', 'sector', 'catalyst') }).Count -gt 0) {
+        throw 'leadStory must contain market, sector, and catalyst supporting points exactly once.'
+    }
+
+    $nextWatch = @(Get-PropertyValue -Object $Report -Name 'nextWatch')
+    if ($nextWatch.Count -lt 1 -or $nextWatch.Count -gt 3) {
+        throw 'The report must contain between one and three nextWatch items.'
+    }
+
     $movers = @(Get-PropertyValue -Object $Report -Name 'movers')
     if ($movers.Count -ne 20) {
         throw 'The report must contain exactly 20 movers.'
@@ -201,6 +223,9 @@ $resolvedReport = (Resolve-Path -LiteralPath $ReportPath).Path
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     throw 'git is required but was not found on PATH.'
 }
+if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
+    throw 'python is required to compile and validate the OKF knowledge bundle.'
+}
 
 $insideWorkTree = (Invoke-Git -WorkingDirectory $resolvedRepository rev-parse --is-inside-work-tree) -join ''
 if ($insideWorkTree.Trim() -ne 'true') {
@@ -245,49 +270,65 @@ try {
     $reportsDirectory = Join-Path $temporaryDirectory 'reports'
     New-Item -ItemType Directory -Path $reportsDirectory -Force | Out-Null
     $destination = Join-Path $reportsDirectory "$marketDate.json"
+    $reportChanged = $true
 
     if (Test-Path -LiteralPath $destination) {
         $existingHash = (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant()
         if ($existingHash -eq $contentHash) {
             Write-Output "Report $marketDate is already published with identical content."
-            return
+            $reportChanged = $false
+        }
+        else {
+            throw "Report $marketDate is already published with different content. Historical reports are immutable; publish a new market date or use a future explicit correction workflow."
         }
     }
-
-    Copy-Item -LiteralPath $resolvedReport -Destination $destination -Force
 
     $indexPath = Join-Path $temporaryDirectory 'index.json'
-    $entries = @()
-    if (Test-Path -LiteralPath $indexPath) {
-        try {
-            $existingIndex = Get-Content -LiteralPath $indexPath -Raw | ConvertFrom-Json -Depth 100 -DateKind String
-            $existingEntries = Get-PropertyValue -Object $existingIndex -Name 'reports'
-            if ($null -ne $existingEntries) {
-                $entries = @($existingEntries | Where-Object { $_.marketDate -ne $marketDate })
+    if ($reportChanged) {
+        Copy-Item -LiteralPath $resolvedReport -Destination $destination -Force
+
+        $entries = @()
+        if (Test-Path -LiteralPath $indexPath) {
+            try {
+                $existingIndex = Get-Content -LiteralPath $indexPath -Raw | ConvertFrom-Json -Depth 100 -DateKind String
+                $existingEntries = Get-PropertyValue -Object $existingIndex -Name 'reports'
+                if ($null -ne $existingEntries) {
+                    $entries = @($existingEntries | Where-Object { $_.marketDate -ne $marketDate })
+                }
+            }
+            catch {
+                throw "Existing reports index is invalid JSON: $($_.Exception.Message)"
             }
         }
-        catch {
-            throw "Existing reports index is invalid JSON: $($_.Exception.Message)"
+
+        $entries += [pscustomobject]@{
+            marketDate = $marketDate
+            path = "reports/$marketDate.json"
+            sha256 = $contentHash
+            publishedAt = $publishedAt
         }
+        $entries = @($entries | Sort-Object marketDate -Descending)
+
+        $index = [ordered]@{
+            generatedAt = $publishedAt
+            latestMarketDate = $entries[0].marketDate
+            reports = $entries
+        }
+        $indexJson = $index | ConvertTo-Json -Depth 20
+        [IO.File]::WriteAllText($indexPath, "$indexJson`n", [Text.UTF8Encoding]::new($false))
     }
 
-    $entries += [pscustomobject]@{
-        marketDate = $marketDate
-        path = "reports/$marketDate.json"
-        sha256 = $contentHash
-        publishedAt = $publishedAt
+    $knowledgeDirectory = Join-Path $temporaryDirectory 'knowledge'
+    $knowledgeOutput = & python -m market_tracker knowledge --reports-dir $reportsDirectory --output-dir $knowledgeDirectory 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        throw "OKF knowledge compilation failed: $($knowledgeOutput -join [Environment]::NewLine)"
     }
-    $entries = @($entries | Sort-Object marketDate -Descending)
-
-    $index = [ordered]@{
-        generatedAt = $publishedAt
-        latestMarketDate = $entries[0].marketDate
-        reports = $entries
+    $knowledgeValidation = & python -m market_tracker validate-knowledge --bundle $knowledgeDirectory 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        throw "OKF knowledge validation failed: $($knowledgeValidation -join [Environment]::NewLine)"
     }
-    $indexJson = $index | ConvertTo-Json -Depth 20
-    [IO.File]::WriteAllText($indexPath, "$indexJson`n", [Text.UTF8Encoding]::new($false))
 
-    Invoke-Git -WorkingDirectory $temporaryDirectory add -- index.json "reports/$marketDate.json" | Out-Null
+    Invoke-Git -WorkingDirectory $temporaryDirectory add --all -- index.json "reports/$marketDate.json" knowledge | Out-Null
     & git -C $temporaryDirectory diff --cached --quiet
     if ($LASTEXITCODE -eq 0) {
         Write-Output 'No publication changes were detected.'
@@ -297,8 +338,9 @@ try {
     Invoke-Git -WorkingDirectory $temporaryDirectory config user.name 'github-actions[bot]' | Out-Null
     Invoke-Git -WorkingDirectory $temporaryDirectory config user.email '41898282+github-actions[bot]@users.noreply.github.com' | Out-Null
 
-    if ($PSCmdlet.ShouldProcess("$Remote/$Branch", "Publish validated report for $marketDate")) {
-        Invoke-Git -WorkingDirectory $temporaryDirectory commit --quiet -m "reports: publish $marketDate" | Out-Null
+    $commitMessage = if ($reportChanged) { "reports: publish $marketDate with OKF knowledge" } else { "knowledge: refresh OKF bundle through $marketDate" }
+    if ($PSCmdlet.ShouldProcess("$Remote/$Branch", "Publish validated report and OKF knowledge for $marketDate")) {
+        Invoke-Git -WorkingDirectory $temporaryDirectory commit --quiet -m $commitMessage | Out-Null
         if ($NoPush) {
             Write-Output "Created publication commit for $marketDate (push skipped)."
         }

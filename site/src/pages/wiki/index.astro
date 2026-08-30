@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EtfGuide from '../../components/EtfGuide.astro';
+import {
+  conceptHref,
+  knowledgeCatalog,
+  referenceConcepts,
+  securityConcepts,
+  themeConcepts,
+  trustLabel,
+  withBase,
+} from '../../lib/knowledge';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const dailyCount = knowledgeCatalog.concepts.filter((concept) => concept.type === 'Daily Market Report').length;
+const groups = [
+  { label: '날짜별 보고서', count: dailyCount, note: '발행 후 바뀌지 않는 검증 기록' },
+  { label: '특징주 타임라인', count: securityConcepts.length, note: '종목이 상·하위에 등장한 날짜 연결' },
+  { label: '시장 테마', count: themeConcepts.length, note: '근거를 통과한 테마의 시간 흐름' },
+  { label: 'ETF·용어·방법론', count: referenceConcepts.length, note: '초보자용 개념과 결정론적 계산 정의' },
+];
+---
+<BaseLayout title="지식 위키 | 마켓 렌즈" description="검증된 미국시장 보고서를 종목·테마·ETF·용어로 연결한 OKF 지식 위키">
+  <header class="site-header shell">
+    <a class="brand" href={`${base}/`}><img class="brand-logo" src={`${base}/favicon.png`} width="34" height="34" alt="" />마켓 렌즈</a>
+    <nav class="top-nav" aria-label="주요 메뉴"><a href={`${base}/reports/`}>지난 리포트</a><span>OKF {knowledgeCatalog.okfVersion}</span></nav>
+  </header>
+  <main id="main-content" class="shell wiki-page">
+    <section class="wiki-hero">
+      <div><p class="eyebrow">Living market knowledge</p><h1>보고서를 넘어<br /><span>연결된 지식으로.</span></h1><p>날짜별 JSON을 원본으로 유지하면서, 종목·테마·ETF·금융용어를 Open Knowledge Format으로 연결했습니다.</p></div>
+      <aside><span>최근 기준일</span><strong>{knowledgeCatalog.latestMarketDate}</strong><small>{knowledgeCatalog.concepts.length}개 개념 · 자동 검증</small></aside>
+    </section>
+
+    <section class="wiki-stat-grid" aria-label="지식 위키 구성">
+      {groups.map((group) => <article><strong>{group.count}</strong><h2>{group.label}</h2><p>{group.note}</p></article>)}
+    </section>
+
+    <section class="section wiki-section">
+      <div class="section-head"><div><p class="section-kicker">Security timeline</p><h2>특징주 다시 보기</h2></div><p class="section-note">등장 횟수와 최근 근거를 날짜별로 연결</p></div>
+      <div class="wiki-card-grid">{securityConcepts.map((concept) => <a class="wiki-card" href={conceptHref(concept)}><div><span>{concept.sector}</span><b>{concept.occurrences?.length ?? 0}회 등장</b></div><h3>{concept.symbol}</h3><p>{concept.description}</p><small>{trustLabel(concept.trust)} →</small></a>)}</div>
+    </section>
+
+    <section class="section wiki-section">
+      <div class="section-head"><div><p class="section-kicker">Theme memory</p><h2>테마의 시간 흐름</h2></div><p class="section-note">그날의 주장 대신 검증 보고서 연결을 보존</p></div>
+      <div class="wiki-card-grid theme-memory">{themeConcepts.map((concept) => <a class="wiki-card" href={conceptHref(concept)}><div><span>시장 테마</span><b>{concept.occurrences?.length ?? 0}개 보고서</b></div><h3>{concept.title}</h3><p>{concept.description}</p><small>{concept.symbols?.join(' · ') || '시장 전체'} →</small></a>)}</div>
+    </section>
+
+    <section class="section wiki-section">
+      <div class="section-head"><div><p class="section-kicker">Reference</p><h2>ETF·용어·계산 방법</h2></div><p class="section-note">사람과 에이전트가 같은 정의를 읽는 영역</p></div>
+      <div class="reference-list">{referenceConcepts.map((concept) => <a href={conceptHref(concept)}><span>{concept.type === 'Fund' ? 'ETF' : concept.type === 'Financial Concept' ? '용어' : '방법론'}</span><div><strong>{concept.title}</strong><p>{concept.description}</p></div><b>열기 →</b></a>)}</div>
+    </section>
+
+    <EtfGuide />
+
+    <section class="wiki-boundary">
+      <strong>원본과 위키의 경계</strong><p>위키는 검증된 리포트를 찾고 연결하는 탐색 계층입니다. 새로운 주가 원인의 독립 증거로 재사용하지 않으며, 다음 보고서는 SEC·기업 IR·독립 뉴스에서 다시 확인합니다.</p>
+      <a href={withBase('/data/knowledge/index.md')}>OKF Bundle 원문 보기 →</a>
+    </section>
+  </main>
+  <footer class="footer"><div class="shell"><strong>마켓 렌즈 지식 위키</strong><span>교육 목적의 시장 정보이며 투자 권유가 아닙니다.</span></div></footer>
+</BaseLayout>

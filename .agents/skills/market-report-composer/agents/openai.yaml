@@ -1,0 +1,8 @@
+interface:
+  display_name: "미국시장 리포트 작성기"
+  short_description: "근거 중심 미국시장 일일 리포트를 구성하고 검수합니다"
+  brand_color: "#83E6B4"
+  default_prompt: "Use $market-report-composer to rebuild this market report around one clear, evidence-backed lead story."
+
+policy:
+  allow_implicit_invocation: true

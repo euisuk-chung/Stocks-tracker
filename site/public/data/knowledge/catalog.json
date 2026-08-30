@@ -1,0 +1,1050 @@
+{
+  "okfVersion": "0.2",
+  "generatedAt": "2026-08-30T01:30:10.471774+00:00",
+  "latestMarketDate": "2026-08-28",
+  "concepts": [
+    {
+      "id": "methodology/mover-selection",
+      "type": "Attested Computation",
+      "title": "특징주 선정 방법",
+      "description": "등락률 순위와 거래량 이상치를 이용한 심층 종목 선정",
+      "path": "methodology/mover-selection.md",
+      "route": "/wiki/concepts/methodology/mover-selection/",
+      "tags": [
+        "methodology",
+        "deterministic",
+        "market-data"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "updatedAt": "2026-08-30T00:00:00+00:00"
+    },
+    {
+      "id": "methodology/moving-averages",
+      "type": "Attested Computation",
+      "title": "1개월·2개월 이동평균선",
+      "description": "20거래일과 40거래일 종가 평균, 기울기와 이격률 계산",
+      "path": "methodology/moving-averages.md",
+      "route": "/wiki/concepts/methodology/moving-averages/",
+      "tags": [
+        "methodology",
+        "deterministic",
+        "market-data"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "updatedAt": "2026-08-30T00:00:00+00:00"
+    },
+    {
+      "id": "methodology/nasdaq-regime",
+      "type": "Attested Computation",
+      "title": "Nasdaq 국면 판정",
+      "description": "QQQ와 1개월·2개월 이동평균선으로 강세·중립·약세를 구분",
+      "path": "methodology/nasdaq-regime.md",
+      "route": "/wiki/concepts/methodology/nasdaq-regime/",
+      "tags": [
+        "methodology",
+        "deterministic",
+        "market-data"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "updatedAt": "2026-08-30T00:00:00+00:00"
+    },
+    {
+      "id": "daily/2026/08/2026-08-28",
+      "type": "Daily Market Report",
+      "title": "2026-08-28 미국시장 특징주 보고서",
+      "description": "DIA와 SPY는 보합권에 가까웠지만 IWM과 QQQ가 더 약했고, 지수보다 업종·종목 간 차이가 컸습니다.",
+      "path": "daily/2026/08/2026-08-28.md",
+      "route": "/reports/2026-08-28/",
+      "tags": [
+        "us-market",
+        "sp500",
+        "nasdaq",
+        "daily-report"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "marketDate": "2026-08-28",
+      "symbols": [
+        "DPZ",
+        "WDAY",
+        "LULU",
+        "NOW",
+        "SLB",
+        "AMZN",
+        "EBAY",
+        "CHTR",
+        "BG",
+        "EXPE",
+        "PYPL",
+        "MRVL",
+        "PCG",
+        "GNRC",
+        "COIN",
+        "LITE",
+        "FIX",
+        "CIEN",
+        "COHR",
+        "LRCX"
+      ],
+      "themeIds": [
+        "theme-01",
+        "theme-02",
+        "theme-03"
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "glossary/expense-ratio",
+      "type": "Financial Concept",
+      "title": "ETF 총보수",
+      "description": "ETF 운용 과정에서 자산에서 지속적으로 차감되는 연간 비용 비율",
+      "path": "glossary/expense-ratio.md",
+      "route": "/wiki/concepts/glossary/expense-ratio/",
+      "tags": [
+        "glossary",
+        "etf",
+        "fee"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "updatedAt": "2026-08-30T00:00:00+00:00"
+    },
+    {
+      "id": "glossary/moving-average",
+      "type": "Financial Concept",
+      "title": "이동평균선",
+      "description": "일정 기간 종가의 평균을 이어 가격 흐름을 부드럽게 본 선",
+      "path": "glossary/moving-average.md",
+      "route": "/wiki/concepts/glossary/moving-average/",
+      "tags": [
+        "glossary",
+        "moving-average"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "updatedAt": "2026-08-30T00:00:00+00:00"
+    },
+    {
+      "id": "glossary/volume-multiple",
+      "type": "Financial Concept",
+      "title": "거래량 배수",
+      "description": "당일 거래량을 직전 20거래일 평균 거래량과 비교한 값",
+      "path": "glossary/volume-multiple.md",
+      "route": "/wiki/concepts/glossary/volume-multiple/",
+      "tags": [
+        "glossary",
+        "volume"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "updatedAt": "2026-08-30T00:00:00+00:00"
+    },
+    {
+      "id": "instruments/DGRO",
+      "type": "Fund",
+      "title": "DGRO · DGRO",
+      "description": "DGRO의 시장 역할과 검증 보고서 관찰 기록",
+      "path": "instruments/DGRO.md",
+      "route": "/wiki/concepts/instruments/DGRO/",
+      "tags": [
+        "fund",
+        "etf",
+        "dgro"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "DGRO",
+      "latestObservation": {
+        "marketDate": "2026-08-28",
+        "close": 79.345,
+        "changePct": 0.082
+      },
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "instruments/DIA",
+      "type": "Fund",
+      "title": "DIA · DIA",
+      "description": "DIA의 시장 역할과 검증 보고서 관찰 기록",
+      "path": "instruments/DIA.md",
+      "route": "/wiki/concepts/instruments/DIA/",
+      "tags": [
+        "fund",
+        "etf",
+        "dia"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "DIA",
+      "latestObservation": {
+        "marketDate": "2026-08-28",
+        "close": 535.06,
+        "changePct": -0.0224
+      },
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "instruments/IWM",
+      "type": "Fund",
+      "title": "IWM · IWM",
+      "description": "IWM의 시장 역할과 검증 보고서 관찰 기록",
+      "path": "instruments/IWM.md",
+      "route": "/wiki/concepts/instruments/IWM/",
+      "tags": [
+        "fund",
+        "etf",
+        "iwm"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "IWM",
+      "latestObservation": {
+        "marketDate": "2026-08-28",
+        "close": 295.75,
+        "changePct": -1.3542
+      },
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "instruments/JEPI",
+      "type": "Fund",
+      "title": "JEPI · JEPI",
+      "description": "JEPI의 시장 역할과 검증 보고서 관찰 기록",
+      "path": "instruments/JEPI.md",
+      "route": "/wiki/concepts/instruments/JEPI/",
+      "tags": [
+        "fund",
+        "etf",
+        "jepi"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "JEPI",
+      "latestObservation": {
+        "marketDate": "2026-08-28",
+        "close": 57.795,
+        "changePct": -0.0778
+      },
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "instruments/QQQ",
+      "type": "Fund",
+      "title": "QQQ · QQQ",
+      "description": "QQQ의 시장 역할과 검증 보고서 관찰 기록",
+      "path": "instruments/QQQ.md",
+      "route": "/wiki/concepts/instruments/QQQ/",
+      "tags": [
+        "fund",
+        "etf",
+        "qqq"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "QQQ",
+      "latestObservation": {
+        "marketDate": "2026-08-28",
+        "close": 716.44,
+        "changePct": -0.66
+      },
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "instruments/SCHD",
+      "type": "Fund",
+      "title": "SCHD · SCHD",
+      "description": "SCHD의 시장 역할과 검증 보고서 관찰 기록",
+      "path": "instruments/SCHD.md",
+      "route": "/wiki/concepts/instruments/SCHD/",
+      "tags": [
+        "fund",
+        "etf",
+        "schd"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "SCHD",
+      "latestObservation": {
+        "marketDate": "2026-08-28",
+        "close": 34.88,
+        "changePct": 0.1579
+      },
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "instruments/SPY",
+      "type": "Fund",
+      "title": "SPY · SPY",
+      "description": "SPY의 시장 역할과 검증 보고서 관찰 기록",
+      "path": "instruments/SPY.md",
+      "route": "/wiki/concepts/instruments/SPY/",
+      "tags": [
+        "fund",
+        "etf",
+        "spy"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "SPY",
+      "latestObservation": {
+        "marketDate": "2026-08-28",
+        "close": 769.28,
+        "changePct": -0.2464
+      },
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "instruments/VYM",
+      "type": "Fund",
+      "title": "VYM · VYM",
+      "description": "VYM의 시장 역할과 검증 보고서 관찰 기록",
+      "path": "instruments/VYM.md",
+      "route": "/wiki/concepts/instruments/VYM/",
+      "tags": [
+        "fund",
+        "etf",
+        "vym"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "VYM",
+      "latestObservation": {
+        "marketDate": "2026-08-28",
+        "close": 164.24,
+        "changePct": -0.0973
+      },
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "themes/theme-01",
+      "type": "Market Theme",
+      "title": "높은 물가와 잭슨홀 발언에 따른 금리 기대 변화",
+      "description": "검증 보고서에서 확인된 ‘높은 물가와 잭슨홀 발언에 따른 금리 기대 변화’ 테마 타임라인",
+      "path": "themes/theme-01.md",
+      "route": "/wiki/themes/theme-01/",
+      "tags": [
+        "market-theme",
+        "dia",
+        "iwm",
+        "qqq",
+        "spy"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "themeId": "theme-01",
+      "symbols": [
+        "DIA",
+        "IWM",
+        "QQQ",
+        "SPY"
+      ],
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "summary": "BEA의 높은 PCE 물가와 견조한 민간수요가 거시 배경을 만들었습니다. Warsh 의장이 물가 우선과 금융 여건이 제약적이지 않다는 점을 강조하자 금리 인상 기대가 커졌습니다. 이 조합은 8월 28일 SPY와 QQQ의 약세, DIA의 상대적 방어, IWM의 더 큰 하락을 설명하는 가장 뚜렷한 시장 공통 배경입니다.",
+          "symbols": [
+            "SPY",
+            "QQQ",
+            "DIA",
+            "IWM"
+          ],
+          "claimIds": [
+            "claim-008",
+            "claim-009"
+          ],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "themes/theme-02",
+      "type": "Market Theme",
+      "title": "AI 수요 확인과 대형 기술주 집중도",
+      "description": "검증 보고서에서 확인된 ‘AI 수요 확인과 대형 기술주 집중도’ 테마 타임라인",
+      "path": "themes/theme-02.md",
+      "route": "/wiki/themes/theme-02/",
+      "tags": [
+        "market-theme",
+        "mrvl",
+        "qqq",
+        "spy",
+        "wday"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "themeId": "theme-02",
+      "symbols": [
+        "MRVL",
+        "QQQ",
+        "SPY",
+        "WDAY"
+      ],
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "summary": "NVIDIA의 강한 실적과 전망은 AI 인프라와 소프트웨어 투자 심리를 개선하며 8월 27일 나스닥 상승을 이끌었습니다. 다만 상승 폭은 소수 대형 기술주에 집중됐고, 8월 28일에는 금리 이슈 속에 일부 되돌림이 나타났습니다. 이는 QQQ와 SPY, MRVL·WDAY의 업종 흐름을 설명하는 배경일 뿐 기업별 촉매를 대신하지는 않습니다.",
+          "symbols": [
+            "QQQ",
+            "SPY",
+            "MRVL",
+            "WDAY"
+          ],
+          "claimIds": [
+            "claim-010"
+          ],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "themes/theme-03",
+      "type": "Market Theme",
+      "title": "호르무즈 공급 위험의 에너지·인플레이션 연결",
+      "description": "검증 보고서에서 확인된 ‘호르무즈 공급 위험의 에너지·인플레이션 연결’ 테마 타임라인",
+      "path": "themes/theme-03.md",
+      "route": "/wiki/themes/theme-03/",
+      "tags": [
+        "market-theme",
+        "iwm",
+        "slb",
+        "spy"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "themeId": "theme-03",
+      "symbols": [
+        "IWM",
+        "SLB",
+        "SPY"
+      ],
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "summary": "미국-이란 협상 진전 기대 약화와 호르무즈 흐름 제한은 원유 가격과 인플레이션 위험을 함께 키웠습니다. 이는 SLB가 속한 에너지 서비스 업종의 우호적 배경이자 연준의 물가 경계가 이어진 이유 중 하나입니다. 다만 SLB 당일 상승의 직접 원인은 확인되지 않았습니다.",
+          "symbols": [
+            "SLB",
+            "SPY",
+            "IWM"
+          ],
+          "claimIds": [
+            "claim-011",
+            "claim-008"
+          ],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/AMZN",
+      "type": "Security",
+      "title": "AMZN · Amazon",
+      "description": "AMZN이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/AMZN.md",
+      "route": "/wiki/symbols/AMZN/",
+      "tags": [
+        "security",
+        "sp500",
+        "consumer-discretionary"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "AMZN",
+      "sector": "Consumer Discretionary",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "gainer",
+          "rank": 6,
+          "changePct": 3.9956,
+          "deepDive": false,
+          "summary": "당일 등락률 +4.00%로 상승 상위 6위입니다.",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/BG",
+      "type": "Security",
+      "title": "BG · Bunge Global",
+      "description": "BG이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/BG.md",
+      "route": "/wiki/symbols/BG/",
+      "tags": [
+        "security",
+        "sp500",
+        "consumer-staples"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "BG",
+      "sector": "Consumer Staples",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "gainer",
+          "rank": 9,
+          "changePct": 3.3677,
+          "deepDive": false,
+          "summary": "당일 등락률 +3.37%로 상승 상위 9위입니다.",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/CHTR",
+      "type": "Security",
+      "title": "CHTR · Charter Communications",
+      "description": "CHTR이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/CHTR.md",
+      "route": "/wiki/symbols/CHTR/",
+      "tags": [
+        "security",
+        "sp500",
+        "communication-services"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "CHTR",
+      "sector": "Communication Services",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "gainer",
+          "rank": 8,
+          "changePct": 3.5394,
+          "deepDive": false,
+          "summary": "당일 등락률 +3.54%로 상승 상위 8위입니다.",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/CIEN",
+      "type": "Security",
+      "title": "CIEN · Ciena",
+      "description": "CIEN이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/CIEN.md",
+      "route": "/wiki/symbols/CIEN/",
+      "tags": [
+        "security",
+        "sp500",
+        "information-technology"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "CIEN",
+      "sector": "Information Technology",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "loser",
+          "rank": 8,
+          "changePct": -5.5735,
+          "deepDive": false,
+          "summary": "당일 등락률 -5.57%로 하락 상위 8위입니다.",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/COHR",
+      "type": "Security",
+      "title": "COHR · Coherent Corp.",
+      "description": "COHR이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/COHR.md",
+      "route": "/wiki/symbols/COHR/",
+      "tags": [
+        "security",
+        "sp500",
+        "information-technology"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "COHR",
+      "sector": "Information Technology",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "loser",
+          "rank": 9,
+          "changePct": -5.5025,
+          "deepDive": false,
+          "summary": "당일 등락률 -5.50%로 하락 상위 9위입니다.",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/COIN",
+      "type": "Security",
+      "title": "COIN · Coinbase",
+      "description": "COIN이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/COIN.md",
+      "route": "/wiki/symbols/COIN/",
+      "tags": [
+        "security",
+        "sp500",
+        "financials"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "COIN",
+      "sector": "Financials",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "loser",
+          "rank": 5,
+          "changePct": -6.4259,
+          "deepDive": false,
+          "summary": "당일 등락률 -6.43%로 하락 상위 5위입니다.",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/DPZ",
+      "type": "Security",
+      "title": "DPZ · Domino's",
+      "description": "DPZ이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/DPZ.md",
+      "route": "/wiki/symbols/DPZ/",
+      "tags": [
+        "security",
+        "sp500",
+        "consumer-discretionary"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "DPZ",
+      "sector": "Consumer Discretionary",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "gainer",
+          "rank": 1,
+          "changePct": 5.3864,
+          "deepDive": false,
+          "summary": "당일 등락률 +5.39%로 상승 상위 1위입니다.",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/EBAY",
+      "type": "Security",
+      "title": "EBAY · eBay Inc.",
+      "description": "EBAY이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/EBAY.md",
+      "route": "/wiki/symbols/EBAY/",
+      "tags": [
+        "security",
+        "sp500",
+        "consumer-discretionary"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "EBAY",
+      "sector": "Consumer Discretionary",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "gainer",
+          "rank": 7,
+          "changePct": 3.5847,
+          "deepDive": false,
+          "summary": "당일 등락률 +3.58%로 상승 상위 7위입니다.",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/EXPE",
+      "type": "Security",
+      "title": "EXPE · Expedia Group",
+      "description": "EXPE이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/EXPE.md",
+      "route": "/wiki/symbols/EXPE/",
+      "tags": [
+        "security",
+        "sp500",
+        "consumer-discretionary"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "EXPE",
+      "sector": "Consumer Discretionary",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "gainer",
+          "rank": 10,
+          "changePct": 3.2332,
+          "deepDive": false,
+          "summary": "당일 등락률 +3.23%로 상승 상위 10위입니다.",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/FIX",
+      "type": "Security",
+      "title": "FIX · Comfort Systems USA",
+      "description": "FIX이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/FIX.md",
+      "route": "/wiki/symbols/FIX/",
+      "tags": [
+        "security",
+        "sp500",
+        "industrials"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "FIX",
+      "sector": "Industrials",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "loser",
+          "rank": 7,
+          "changePct": -5.9125,
+          "deepDive": false,
+          "summary": "당일 등락률 -5.91%로 하락 상위 7위입니다.",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/GNRC",
+      "type": "Security",
+      "title": "GNRC · Generac",
+      "description": "GNRC이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/GNRC.md",
+      "route": "/wiki/symbols/GNRC/",
+      "tags": [
+        "security",
+        "sp500",
+        "industrials"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "GNRC",
+      "sector": "Industrials",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "loser",
+          "rank": 4,
+          "changePct": -6.9097,
+          "deepDive": false,
+          "summary": "당일 등락률 -6.91%로 하락 상위 4위입니다.",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/LITE",
+      "type": "Security",
+      "title": "LITE · Lumentum",
+      "description": "LITE이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/LITE.md",
+      "route": "/wiki/symbols/LITE/",
+      "tags": [
+        "security",
+        "sp500",
+        "information-technology"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "LITE",
+      "sector": "Information Technology",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "loser",
+          "rank": 6,
+          "changePct": -6.3389,
+          "deepDive": false,
+          "summary": "당일 등락률 -6.34%로 하락 상위 6위입니다.",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/LRCX",
+      "type": "Security",
+      "title": "LRCX · Lam Research",
+      "description": "LRCX이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/LRCX.md",
+      "route": "/wiki/symbols/LRCX/",
+      "tags": [
+        "security",
+        "sp500",
+        "information-technology"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "LRCX",
+      "sector": "Information Technology",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "loser",
+          "rank": 10,
+          "changePct": -5.2318,
+          "deepDive": false,
+          "summary": "당일 등락률 -5.23%로 하락 상위 10위입니다.",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/LULU",
+      "type": "Security",
+      "title": "LULU · Lululemon Athletica",
+      "description": "LULU이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/LULU.md",
+      "route": "/wiki/symbols/LULU/",
+      "tags": [
+        "security",
+        "sp500",
+        "consumer-discretionary"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "LULU",
+      "sector": "Consumer Discretionary",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "gainer",
+          "rank": 3,
+          "changePct": 5.1249,
+          "deepDive": true,
+          "summary": "확인된 단일 촉매 없음",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/MRVL",
+      "type": "Security",
+      "title": "MRVL · Marvell Technology",
+      "description": "MRVL이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/MRVL.md",
+      "route": "/wiki/symbols/MRVL/",
+      "tags": [
+        "security",
+        "sp500",
+        "information-technology"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "MRVL",
+      "sector": "Information Technology",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "loser",
+          "rank": 2,
+          "changePct": -10.2532,
+          "deepDive": true,
+          "summary": "Marvell은 2027회계연도 2분기 실적과 상향 전망을 발표했습니다. 다만 Google AI 칩 계약의 매출 기여 시점과 장기 성장 전망이 높아진 시장 기대에 못 미쳤다는 평가가 나오며 주가가 하락했습니다.",
+          "claimIds": [
+            "claim-006"
+          ],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/NOW",
+      "type": "Security",
+      "title": "NOW · ServiceNow",
+      "description": "NOW이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/NOW.md",
+      "route": "/wiki/symbols/NOW/",
+      "tags": [
+        "security",
+        "sp500",
+        "information-technology"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "NOW",
+      "sector": "Information Technology",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "gainer",
+          "rank": 4,
+          "changePct": 4.522,
+          "deepDive": false,
+          "summary": "당일 등락률 +4.52%로 상승 상위 4위입니다.",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/PCG",
+      "type": "Security",
+      "title": "PCG · PG&E Corporation",
+      "description": "PCG이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/PCG.md",
+      "route": "/wiki/symbols/PCG/",
+      "tags": [
+        "security",
+        "sp500",
+        "utilities"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "PCG",
+      "sector": "Utilities",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "loser",
+          "rank": 3,
+          "changePct": -7.5403,
+          "deepDive": true,
+          "summary": "확인된 단일 촉매 없음",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/PYPL",
+      "type": "Security",
+      "title": "PYPL · PayPal",
+      "description": "PYPL이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/PYPL.md",
+      "route": "/wiki/symbols/PYPL/",
+      "tags": [
+        "security",
+        "sp500",
+        "financials"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "PYPL",
+      "sector": "Financials",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "loser",
+          "rank": 1,
+          "changePct": -12.678,
+          "deepDive": true,
+          "summary": "Stripe와 Advent International이 PayPal 인수 추진을 중단했다는 보도가 나왔습니다. 인수 기대가 주가에 반영됐던 만큼, 추진 중단 보도 뒤 인수 프리미엄(인수 기대가 더해진 가격)이 줄며 주가가 큰 폭으로 하락했습니다.",
+          "claimIds": [
+            "claim-005"
+          ],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/SLB",
+      "type": "Security",
+      "title": "SLB · Schlumberger",
+      "description": "SLB이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/SLB.md",
+      "route": "/wiki/symbols/SLB/",
+      "tags": [
+        "security",
+        "sp500",
+        "energy"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "SLB",
+      "sector": "Energy",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "gainer",
+          "rank": 5,
+          "changePct": 4.1803,
+          "deepDive": true,
+          "summary": "확인된 단일 촉매 없음",
+          "claimIds": [],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    },
+    {
+      "id": "symbols/WDAY",
+      "type": "Security",
+      "title": "WDAY · Workday, Inc.",
+      "description": "WDAY이 특징주로 등장한 검증 보고서 타임라인",
+      "path": "symbols/WDAY.md",
+      "route": "/wiki/symbols/WDAY/",
+      "tags": [
+        "security",
+        "sp500",
+        "information-technology"
+      ],
+      "status": "stable",
+      "trust": "machine-confirmed",
+      "symbol": "WDAY",
+      "sector": "Information Technology",
+      "occurrences": [
+        {
+          "marketDate": "2026-08-28",
+          "direction": "gainer",
+          "rank": 2,
+          "changePct": 5.3383,
+          "deepDive": true,
+          "summary": "Workday는 8월 27일 장 마감 후 회계연도 2027년 2분기 매출 26억4900만달러(전년 대비 12.8% 증가)와 구독 매출 24억7100만달러(13.9% 증가)를 발표했습니다. 비GAAP 영업이익률(일부 항목을 제외해 본 수익성)은 31.1%였고 연간 전망은 31.0%로 높였습니다. 자사주 매입(회사가 자기 주식을 사들이는 주주환원)도 40억달러 추가 승인했습니다.",
+          "claimIds": [
+            "claim-001"
+          ],
+          "reportRoute": "/reports/2026-08-28/"
+        }
+      ],
+      "updatedAt": "2026-08-30T01:30:10.471774+00:00"
+    }
+  ]
+}

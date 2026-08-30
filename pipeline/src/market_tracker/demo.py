@@ -14,6 +14,10 @@ from .models import (
     EvidenceLedger,
     EvidenceLevel,
     EvidenceSource,
+    LeadPointRole,
+    LeadStory,
+    LeadStoryPoint,
+    NextWatchItem,
     ReportMetadata,
     ReportMover,
     ReportQa,
@@ -207,6 +211,12 @@ def build_demo_documents(market_date: date) -> tuple[MarketSnapshot, EvidenceLed
         for name in ("fact_checker", "blog_quality_reviewer", "humanify_reviewer")
     )
     statuses = immutable_mapping({review.reviewer: review.verdict for review in reviews})
+    market_etfs = tuple(security_by_symbol[symbol] for symbol in snapshot.market_etfs)
+    weakest_etf = min(market_etfs, key=lambda item: item.change_pct)
+    strongest_etf = max(market_etfs, key=lambda item: item.change_pct)
+    deep_movers = tuple(item for item in movers if item.deep_dive)
+    confirmed_deep_movers = tuple(item for item in deep_movers if item.claim_ids)
+    lead_claim_ids = tuple(dict.fromkeys(claim for item in confirmed_deep_movers for claim in item.claim_ids))
     report = DailyReport(
         metadata=ReportMetadata(
             schema_version=SCHEMA_VERSION,
@@ -214,6 +224,31 @@ def build_demo_documents(market_date: date) -> tuple[MarketSnapshot, EvidenceLed
             captured_at=captured_at,
             generated_at=captured_at,
             snapshot_hash=snapshot.input_hash,
+        ),
+        lead_story=LeadStory(
+            headline=f"{weakest_etf.symbol}가 주요 지수 ETF 중 가장 약했던 날",
+            takeaway=(
+                f"{strongest_etf.symbol} {strongest_etf.change_pct:+.2f}%와 "
+                f"{weakest_etf.symbol} {weakest_etf.change_pct:+.2f}% 사이의 흐름 차이를 먼저 확인합니다."
+            ),
+            supporting_points=(
+                LeadStoryPoint(
+                    LeadPointRole.MARKET,
+                    f"주요 지수 ETF 가운데 {strongest_etf.symbol}는 {strongest_etf.change_pct:+.2f}%, "
+                    f"{weakest_etf.symbol}는 {weakest_etf.change_pct:+.2f}%였습니다.",
+                    (),
+                ),
+                LeadStoryPoint(
+                    LeadPointRole.SECTOR,
+                    "거래대금 가중 섹터 흐름이 같은 방향으로 정렬됐는지 히트맵에서 확인합니다.",
+                    (),
+                ),
+                LeadStoryPoint(
+                    LeadPointRole.CATALYST,
+                    f"심층 6개 종목 중 {len(confirmed_deep_movers)}개는 등록된 근거와 연결됐습니다.",
+                    lead_claim_ids,
+                ),
+            ),
         ),
         market_pulse=(
             "S&P 500 구성 종목의 상승·하락 폭을 함께 살펴봅니다.",
@@ -224,7 +259,7 @@ def build_demo_documents(market_date: date) -> tuple[MarketSnapshot, EvidenceLed
         sector_heatmap=snapshot.sector_heatmap,
         movers=tuple(movers),
         themes=ledger.themes,
-        market_etfs=tuple(security_by_symbol[symbol] for symbol in snapshot.market_etfs),
+        market_etfs=market_etfs,
         income_basket=tuple(security_by_symbol[symbol] for symbol in snapshot.income_basket),
         sources=ledger.sources,
         source_ids=tuple(item.source_id for item in ledger.sources),
@@ -234,6 +269,20 @@ def build_demo_documents(market_date: date) -> tuple[MarketSnapshot, EvidenceLed
             reviewer_statuses=statuses,
             validation_errors=(),
             revision_count=0,
+        ),
+        next_watch=(
+            NextWatchItem(
+                title="지수 ETF 사이의 흐름 차이",
+                description="강한 지수와 약한 지수의 격차가 다음 거래일에도 이어지는지 새 종가로 확인합니다.",
+                symbols=(strongest_etf.symbol, weakest_etf.symbol),
+                claim_ids=(),
+            ),
+            NextWatchItem(
+                title="심층 종목의 후속 공시",
+                description="등록된 사건의 후속 공시와 단일 촉매가 확인되지 않은 종목의 새 자료를 확인합니다.",
+                symbols=tuple(item.symbol for item in deep_movers),
+                claim_ids=lead_claim_ids,
+            ),
         ),
         disclaimer="이 리포트는 교육 목적의 정보이며 투자 조언이나 매수·매도 추천이 아닙니다.",
     )

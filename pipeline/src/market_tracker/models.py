@@ -7,7 +7,7 @@ from types import MappingProxyType
 from typing import Any, Mapping
 
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "2.0.0"
 
 
 class Direction(str, Enum):
@@ -42,6 +42,12 @@ class MovingAverageCross(str, Enum):
     GOLDEN = "golden"
     DEATH = "death"
     NONE = "none"
+
+
+class LeadPointRole(str, Enum):
+    MARKET = "market"
+    SECTOR = "sector"
+    CATALYST = "catalyst"
 
 
 def _json_key(value: str) -> str:
@@ -86,7 +92,7 @@ class ChartPoint(JsonModel):
     close: float
     volume: int
     sma20: float | None
-    sma30: float | None
+    sma40: float | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -102,11 +108,11 @@ class SecuritySnapshot(JsonModel):
     average_volume_20: float
     volume_ratio_20: float
     sma20: float
-    sma30: float
+    sma40: float
     sma20_slope_5_pct: float
-    sma30_slope_5_pct: float
+    sma40_slope_5_pct: float
     distance_sma20_pct: float
-    distance_sma30_pct: float
+    distance_sma40_pct: float
     moving_average_cross: MovingAverageCross
     anomaly_score: float
     history: tuple[ChartPoint, ...]
@@ -255,8 +261,31 @@ class ReportMover(JsonModel):
 
 
 @dataclass(frozen=True, slots=True)
+class LeadStoryPoint(JsonModel):
+    role: LeadPointRole
+    text: str
+    claim_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class LeadStory(JsonModel):
+    headline: str
+    takeaway: str
+    supporting_points: tuple[LeadStoryPoint, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class NextWatchItem(JsonModel):
+    title: str
+    description: str
+    symbols: tuple[str, ...]
+    claim_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class DailyReport(JsonModel):
     metadata: ReportMetadata
+    lead_story: LeadStory
     market_pulse: tuple[str, ...]
     nasdaq_regime: NasdaqRegime
     sector_heatmap: tuple[HeatmapEntry, ...]
@@ -268,6 +297,7 @@ class DailyReport(JsonModel):
     source_ids: tuple[str, ...]
     reviews: tuple[ReviewResult, ...]
     qa: ReportQa
+    next_watch: tuple[NextWatchItem, ...]
     disclaimer: str
 
 

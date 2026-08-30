@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { okfSourceHref, themeConcepts, trustLabel, withBase, type KnowledgeConcept } from '../../../lib/knowledge';
+
+export function getStaticPaths() {
+  return themeConcepts.map((concept) => ({ params: { theme: concept.themeId }, props: { concept } }));
+}
+
+interface Props { concept: KnowledgeConcept; }
+const { concept } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<BaseLayout title={`${concept.title} | 마켓 렌즈 지식 위키`} description={concept.description}>
+  <header class="site-header shell"><a class="brand" href={`${base}/`}><img class="brand-logo" src={`${base}/favicon.png`} width="34" height="34" alt="" />마켓 렌즈</a><nav class="top-nav"><a href={withBase('/wiki/')}>지식 위키</a><span>{trustLabel(concept.trust)}</span></nav></header>
+  <main id="main-content" class="shell knowledge-detail">
+    <header class="knowledge-title"><p class="eyebrow">Market theme memory</p><h1>{concept.title}</h1><p>{concept.description}</p><div>{concept.symbols?.map((symbol) => <span>{symbol}</span>)}<a href={okfSourceHref(concept)}>OKF 원문</a></div></header>
+    <section class="timeline">
+      {concept.occurrences?.map((item) => <article><time>{item.marketDate}</time><div><p>{item.summary}</p><div class="theme-symbols">{item.symbols?.map((symbol) => <span>{symbol}</span>)}</div><a href={withBase(item.reportRoute)}>당일 보고서와 출처 확인 →</a></div></article>)}
+    </section>
+    <aside class="wiki-boundary"><strong>테마는 기억이지 예측이 아닙니다</strong><p>여기에는 검증을 통과한 과거 보고서만 연결됩니다. 같은 이름의 테마라도 새로운 거래일에는 외부 근거를 다시 조사합니다.</p></aside>
+  </main>
+</BaseLayout>

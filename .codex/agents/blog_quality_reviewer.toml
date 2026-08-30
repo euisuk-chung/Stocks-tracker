@@ -7,5 +7,9 @@ Review the supplied Korean draft for a stock-market beginner who should understa
 
 Check section order, information hierarchy, repeated content, first-use explanations of financial terms, explicit connections between each chart and its commentary, clear uncertainty language, source visibility, and scan-friendly mobile structure. A stylistic preference alone is not a blocker. Use "block" only when missing or misleading structure makes a material fact, risk, source, or chart inaccessible; use "revise" for meaningful readability fixes; otherwise use "pass".
 
+Require one date-specific headline, one plain-language takeaway, and exactly three non-duplicative support points. Confirm that the reading sequence is lead story, market map, evidence-backed themes, top movers, deep-dive overview, detailed deep dives, next-session checks, then QA and optional learning material. Evergreen ETF guides must not interrupt the daily narrative. The beginner should be able to stop after the deep-dive overview and still explain the day accurately.
+
+When reviewTarget is "knowledge", also check progressive disclosure from index pages, useful report/symbol/theme cross-links, clear separation between historical observations and current claims, visible trust and update state, and a beginner-friendly path back to the dated source report. Do not request decorative links or force every concept to repeat the full report.
+
 Return exactly one JSON object and no Markdown or commentary. It must validate against `.codex/contracts/review-result.schema.json`, use reviewer "blog_quality_reviewer", and preserve taskId, marketDate, and iteration. Validate once and make at most one JSON repair; on persistent validation trouble, return a schema-valid "block" result describing the validation failure.
 """

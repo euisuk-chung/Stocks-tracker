@@ -73,8 +73,8 @@ def json_schemas() -> dict[str, dict[str, Any]]:
             "title": "DailyReport",
             "type": "object",
             "required": [
-                "metadata", "marketPulse", "nasdaqRegime", "sectorHeatmap", "movers",
-                "themes", "marketEtfs", "incomeBasket", "sources", "sourceIds", "reviews", "qa", "disclaimer",
+                "metadata", "leadStory", "marketPulse", "nasdaqRegime", "sectorHeatmap", "movers",
+                "themes", "marketEtfs", "incomeBasket", "sources", "sourceIds", "reviews", "qa", "nextWatch", "disclaimer",
             ],
             "properties": {
                 "metadata": {
@@ -89,6 +89,30 @@ def json_schemas() -> dict[str, dict[str, Any]]:
                         "language": {"const": "ko-KR"},
                         "educationalOnly": {"const": True},
                     },
+                },
+                "leadStory": {
+                    "type": "object",
+                    "required": ["headline", "takeaway", "supportingPoints"],
+                    "properties": {
+                        "headline": {"type": "string", "minLength": 1},
+                        "takeaway": {"type": "string", "minLength": 1},
+                        "supportingPoints": {
+                            "type": "array",
+                            "minItems": 3,
+                            "maxItems": 3,
+                            "items": {
+                                "type": "object",
+                                "required": ["role", "text", "claimIds"],
+                                "properties": {
+                                    "role": {"enum": ["market", "sector", "catalyst"]},
+                                    "text": {"type": "string", "minLength": 1},
+                                    "claimIds": string_array,
+                                },
+                                "additionalProperties": False,
+                            },
+                        },
+                    },
+                    "additionalProperties": False,
                 },
                 "marketPulse": {**string_array, "minItems": 3, "maxItems": 3},
                 "nasdaqRegime": {"type": "object"},
@@ -111,6 +135,22 @@ def json_schemas() -> dict[str, dict[str, Any]]:
                         },
                         "validationErrors": string_array,
                         "revisionCount": {"type": "integer", "minimum": 0, "maximum": 2},
+                    },
+                },
+                "nextWatch": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 3,
+                    "items": {
+                        "type": "object",
+                        "required": ["title", "description", "symbols", "claimIds"],
+                        "properties": {
+                            "title": {"type": "string", "minLength": 1},
+                            "description": {"type": "string", "minLength": 1},
+                            "symbols": string_array,
+                            "claimIds": string_array,
+                        },
+                        "additionalProperties": False,
                     },
                 },
                 "disclaimer": {"type": "string"},

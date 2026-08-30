@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { formatPct } from '../../../lib/reports';
+import { okfSourceHref, securityConcepts, trustLabel, withBase, type KnowledgeConcept } from '../../../lib/knowledge';
+
+export function getStaticPaths() {
+  return securityConcepts.map((concept) => ({ params: { symbol: concept.symbol }, props: { concept } }));
+}
+
+interface Props { concept: KnowledgeConcept; }
+const { concept } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<BaseLayout title={`${concept.symbol} 특징주 기록 | 마켓 렌즈`} description={concept.description}>
+  <header class="site-header shell"><a class="brand" href={`${base}/`}><img class="brand-logo" src={`${base}/favicon.png`} width="34" height="34" alt="" />마켓 렌즈</a><nav class="top-nav"><a href={withBase('/wiki/')}>지식 위키</a><span>{trustLabel(concept.trust)}</span></nav></header>
+  <main id="main-content" class="shell knowledge-detail">
+    <header class="knowledge-title"><p class="eyebrow">Security timeline · {concept.sector}</p><h1>{concept.symbol}</h1><p>{concept.title.replace(`${concept.symbol} · `, '')}이 특징주로 등장한 검증 보고서를 시간순으로 모았습니다.</p><div><span>{concept.occurrences?.length ?? 0}회 등장</span><span>{trustLabel(concept.trust)}</span><a href={okfSourceHref(concept)}>OKF 원문</a></div></header>
+    <section class="timeline">
+      {concept.occurrences?.map((item) => <article><time>{item.marketDate}</time><div><div class="timeline-meta"><span class={item.direction === 'gainer' ? 'up' : 'down'}>{item.direction === 'gainer' ? '상승' : '하락'} {item.rank}위</span><strong class={item.changePct && item.changePct >= 0 ? 'up' : 'down'}>{formatPct(item.changePct ?? 0)}</strong>{item.deepDive && <b>심층분석</b>}</div><p>{item.summary}</p><a href={withBase(item.reportRoute)}>당일 보고서에서 확인 →</a></div></article>)}
+    </section>
+    <aside class="wiki-boundary"><strong>읽는 방법</strong><p>각 항목은 해당 날짜에 관찰된 사실입니다. 서로 다른 날짜의 설명을 하나의 지속적인 원인으로 합치지 않습니다.</p></aside>
+  </main>
+</BaseLayout>

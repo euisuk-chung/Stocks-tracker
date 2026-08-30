@@ -20,6 +20,7 @@ from .config import (
 from .contracts import json_schemas
 from .demo import build_demo_documents
 from .io import read_json, write_json
+from .knowledge import compile_knowledge_directory, validate_knowledge_bundle
 from .preflight import inspect_preflight
 from .universe import load_or_refresh_universe, write_universe_csv, fetch_sp500_universe
 from .validation import validate_json_contract, validate_report
@@ -50,6 +51,8 @@ def _write_documents(
         output_dir / "reports" / "latest.json",
         {"marketDate": report_date.isoformat(), "path": f"reports/{report_date.isoformat()}.json"},
     )
+    if not report_only:
+        compile_knowledge_directory(output_dir / "reports", output_dir / "knowledge")
     return report_path
 
 
@@ -169,6 +172,22 @@ def command_preflight(args: argparse.Namespace) -> int:
     return 0 if result.ready else 2
 
 
+def command_knowledge(args: argparse.Namespace) -> int:
+    catalog = compile_knowledge_directory(args.reports_dir, args.output_dir)
+    print(f"{args.output_dir} ({len(catalog['concepts'])} concepts)")
+    return 0
+
+
+def command_validate_knowledge(args: argparse.Namespace) -> int:
+    errors = validate_knowledge_bundle(args.bundle)
+    if errors:
+        for error in errors:
+            print(error, file=sys.stderr)
+        return 2
+    print("valid OKF bundle")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="market-tracker")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -207,6 +226,15 @@ def build_parser() -> argparse.ArgumentParser:
     preflight.add_argument("--existing-report", type=Path)
     preflight.add_argument("--input-hash")
     preflight.set_defaults(handler=command_preflight)
+
+    knowledge = subparsers.add_parser("knowledge", help="Compile an OKF knowledge bundle from published reports")
+    knowledge.add_argument("--reports-dir", type=Path, required=True)
+    knowledge.add_argument("--output-dir", type=Path, required=True)
+    knowledge.set_defaults(handler=command_knowledge)
+
+    validate_knowledge = subparsers.add_parser("validate-knowledge", help="Validate the generated OKF knowledge bundle")
+    validate_knowledge.add_argument("--bundle", type=Path, required=True)
+    validate_knowledge.set_defaults(handler=command_validate_knowledge)
     return parser
 
 

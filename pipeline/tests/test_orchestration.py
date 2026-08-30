@@ -11,3 +11,7 @@ def test_research_and_revision_loops_are_bounded() -> None:
     budget = budget.revise().revise()
     with pytest.raises(LoopLimitExceeded):
         budget.revise()
+
+    budget = budget.revise_knowledge()
+    with pytest.raises(LoopLimitExceeded):
+        budget.revise_knowledge()

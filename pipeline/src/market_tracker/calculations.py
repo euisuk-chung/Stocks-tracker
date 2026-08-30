@@ -22,7 +22,7 @@ from .models import (
 )
 
 
-MINIMUM_BARS = 35
+MINIMUM_BARS = 45
 
 
 def _round(value: float, digits: int = 4) -> float:
@@ -56,22 +56,22 @@ def calculate_security(
         raise ValueError(f"{definition.symbol} contains invalid price or volume")
 
     sma20_values = _rolling_average(closes, 20)
-    sma30_values = _rolling_average(closes, 30)
+    sma40_values = _rolling_average(closes, 40)
     latest, previous = ordered[-1], ordered[-2]
     sma20 = float(sma20_values[-1])
-    sma30 = float(sma30_values[-1])
+    sma40 = float(sma40_values[-1])
     sma20_prior = float(sma20_values[-6])
-    sma30_prior = float(sma30_values[-6])
+    sma40_prior = float(sma40_values[-6])
     prior_sma20 = float(sma20_values[-2])
-    prior_sma30 = float(sma30_values[-2])
+    prior_sma40 = float(sma40_values[-2])
     average_volume_20 = fmean(volumes[-21:-1])
     volume_ratio = latest.volume / average_volume_20 if average_volume_20 else 0.0
     change_pct = (latest.close / previous.close - 1) * 100
 
     cross = MovingAverageCross.NONE
-    if prior_sma20 <= prior_sma30 and sma20 > sma30:
+    if prior_sma20 <= prior_sma40 and sma20 > sma40:
         cross = MovingAverageCross.GOLDEN
-    elif prior_sma20 >= prior_sma30 and sma20 < sma30:
+    elif prior_sma20 >= prior_sma40 and sma20 < sma40:
         cross = MovingAverageCross.DEATH
 
     history = tuple(
@@ -80,7 +80,7 @@ def calculate_security(
             close=_round(bar.close),
             volume=bar.volume,
             sma20=_round(sma20_values[index]) if sma20_values[index] is not None else None,
-            sma30=_round(sma30_values[index]) if sma30_values[index] is not None else None,
+            sma40=_round(sma40_values[index]) if sma40_values[index] is not None else None,
         )
         for index, bar in enumerate(ordered[-70:], start=max(0, len(ordered) - 70))
     )
@@ -96,11 +96,11 @@ def calculate_security(
         average_volume_20=_round(average_volume_20, 2),
         volume_ratio_20=_round(volume_ratio),
         sma20=_round(sma20),
-        sma30=_round(sma30),
+        sma40=_round(sma40),
         sma20_slope_5_pct=_round((sma20 / sma20_prior - 1) * 100),
-        sma30_slope_5_pct=_round((sma30 / sma30_prior - 1) * 100),
+        sma40_slope_5_pct=_round((sma40 / sma40_prior - 1) * 100),
         distance_sma20_pct=_round((latest.close / sma20 - 1) * 100),
-        distance_sma30_pct=_round((latest.close / sma30 - 1) * 100),
+        distance_sma40_pct=_round((latest.close / sma40 - 1) * 100),
         moving_average_cross=cross,
         anomaly_score=_round(abs(change_pct) * max(volume_ratio, 1.0)),
         history=history,
@@ -109,24 +109,24 @@ def calculate_security(
 
 def classify_regime(security: SecuritySnapshot) -> tuple[Regime, tuple[str, ...]]:
     if (
-        security.close > security.sma20 > security.sma30
+        security.close > security.sma20 > security.sma40
         and security.sma20_slope_5_pct > 0
-        and security.sma30_slope_5_pct > 0
+        and security.sma40_slope_5_pct > 0
     ):
         return Regime.BULLISH, (
-            "QQQ 종가가 20일선과 30일선 위에 있습니다.",
-            "20일선과 30일선의 5거래일 기울기가 모두 상승 방향입니다.",
+            "QQQ 종가가 1개월선(20거래일)과 2개월선(40거래일) 위에 있습니다.",
+            "1개월선과 2개월선의 5거래일 기울기가 모두 상승 방향입니다.",
         )
     if (
-        security.close < security.sma20 < security.sma30
+        security.close < security.sma20 < security.sma40
         and security.sma20_slope_5_pct < 0
-        and security.sma30_slope_5_pct < 0
+        and security.sma40_slope_5_pct < 0
     ):
         return Regime.BEARISH, (
-            "QQQ 종가가 20일선과 30일선 아래에 있습니다.",
-            "20일선과 30일선의 5거래일 기울기가 모두 하락 방향입니다.",
+            "QQQ 종가가 1개월선(20거래일)과 2개월선(40거래일) 아래에 있습니다.",
+            "1개월선과 2개월선의 5거래일 기울기가 모두 하락 방향입니다.",
         )
-    return Regime.NEUTRAL, ("가격과 이동평균선의 위치 또는 방향이 한쪽으로 일치하지 않습니다.",)
+    return Regime.NEUTRAL, ("가격 위치와 이동평균선 방향이 한쪽 흐름으로 모이지 않고 엇갈려 있습니다.",)
 
 
 def _rank(

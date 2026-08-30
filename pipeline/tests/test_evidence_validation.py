@@ -5,7 +5,15 @@ from datetime import date, datetime, timedelta, timezone
 
 from market_tracker.demo import build_demo_documents
 from market_tracker.evidence import normalize_ledger
-from market_tracker.models import EvidenceItem, EvidenceLevel, EvidenceSource, ReportQa, ReviewVerdict, immutable_mapping
+from market_tracker.models import (
+    EvidenceItem,
+    EvidenceLevel,
+    EvidenceSource,
+    LeadPointRole,
+    ReportQa,
+    ReviewVerdict,
+    immutable_mapping,
+)
 from market_tracker.validation import validate_ledger, validate_report
 
 
@@ -88,3 +96,17 @@ def test_deep_dive_flags_must_match_immutable_snapshot() -> None:
 
     assert "report movers do not match snapshot rankings" in errors
     assert "report must identify exactly 6 deep-dive movers" in errors
+
+
+def test_lead_story_roles_and_claim_ids_are_validated() -> None:
+    snapshot, ledger, report = build_demo_documents(MARKET_DATE)
+    points = report.lead_story.supporting_points
+    duplicated_role = replace(points[1], role=LeadPointRole.MARKET)
+    unknown_claim = replace(points[2], claim_ids=("not-registered",))
+    invalid_lead = replace(report.lead_story, supporting_points=(points[0], duplicated_role, unknown_claim))
+    invalid_report = replace(report, lead_story=invalid_lead)
+
+    errors = validate_report(invalid_report, snapshot, ledger)
+
+    assert "report leadStory must contain market, sector, and catalyst support exactly once" in errors
+    assert any("unknown claimIds" in error for error in errors)

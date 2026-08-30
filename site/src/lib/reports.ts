@@ -4,7 +4,7 @@ export interface ChartPoint {
   date: string;
   close: number;
   ma20?: number | null;
-  ma30?: number | null;
+  ma40?: number | null;
 }
 
 export interface Mover {
@@ -19,6 +19,11 @@ export interface Mover {
 
 export interface DailyReport {
   metadata: { marketDate: string; generatedAt: string; dataSource: string; isDemo: boolean };
+  leadStory: {
+    headline: string;
+    takeaway: string;
+    supportingPoints: Array<{ role: 'market' | 'sector' | 'catalyst'; text: string; claimIds: string[] }>;
+  };
   summary: string[];
   marketPulse: Array<{ ticker: string; name: string; tracks: string; role: string; close: number; changePct: number }>;
   nasdaqRegime: { current: Regime; previous: Regime | '이전 기록 없음'; explanation: string };
@@ -37,6 +42,7 @@ export interface DailyReport {
   incomeBasket: Array<{ symbol: string; name: string; kind: 'ETF' | '주식'; description: string; changePct: number }>;
   sources: Array<{ id: string; title: string; publisher: string; url: string; publishedAt: string }>;
   qa: { publishable: boolean; rounds: number; reviews: Array<{ reviewer: string; verdict: 'pass' | 'revise' | 'block' }> };
+  nextWatch: Array<{ title: string; description: string; symbols: string[]; claimIds: string[] }>;
 }
 
 interface RawSecurity {
@@ -49,11 +55,12 @@ interface RawSecurity {
   volumeRatio20: number;
   distanceSma20Pct: number;
   movingAverageCross: 'golden' | 'death' | 'none';
-  history: Array<{ date: string; close: number; sma20: number | null; sma30: number | null }>;
+  history: Array<{ date: string; close: number; sma20: number | null; sma40: number | null }>;
 }
 
 interface RawReport {
   metadata: { marketDate: string; generatedAt: string };
+  leadStory: DailyReport['leadStory'];
   marketPulse: string[];
   nasdaqRegime: {
     state: 'bullish' | 'neutral' | 'bearish';
@@ -78,6 +85,7 @@ interface RawReport {
   sources: Array<{ sourceId: string; title: string; publisher: string; url: string; publishedAt: string }>;
   reviews: Array<{ reviewer: string; verdict: 'pass' | 'revise' | 'block' }>;
   qa: { publishable: boolean; revisionCount: number };
+  nextWatch: DailyReport['nextWatch'];
 }
 
 const regimeLabels = { bullish: '강세', neutral: '중립', bearish: '약세' } as const;
@@ -106,6 +114,7 @@ function normalizeReport(raw: RawReport): DailyReport {
       dataSource: 'Alpaca 시세 · SEC/기업 IR 및 검증된 뉴스',
       isDemo: raw.sources.length > 0 && raw.sources.every((source) => source.url.includes('example.com')),
     },
+    leadStory: raw.leadStory,
     summary: raw.marketPulse,
     marketPulse: raw.marketEtfs.map((item) => ({
       ticker: item.symbol,
@@ -132,7 +141,7 @@ function normalizeReport(raw: RawReport): DailyReport {
       risk: item.risks.join(' '),
       chartReading: item.chartCommentary,
       claimIds: item.claimIds,
-      chart: item.marketData.history.map((point) => ({ date: point.date, close: point.close, ma20: point.sma20, ma30: point.sma30 })),
+      chart: item.marketData.history.map((point) => ({ date: point.date, close: point.close, ma20: point.sma20, ma40: point.sma40 })),
     })),
     themes: raw.themes,
     incomeBasket: raw.incomeBasket.map((item) => ({
@@ -144,6 +153,7 @@ function normalizeReport(raw: RawReport): DailyReport {
     })),
     sources: raw.sources.map((source) => ({ id: source.sourceId, ...source })),
     qa: { publishable: raw.qa.publishable, rounds: raw.qa.revisionCount, reviews: raw.reviews },
+    nextWatch: raw.nextWatch,
   };
 }
 

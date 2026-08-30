@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { formatNumber, formatPct } from '../../../lib/reports';
+import { okfSourceHref, referenceConcepts, trustLabel, withBase, type KnowledgeConcept } from '../../../lib/knowledge';
+
+export function getStaticPaths() {
+  return referenceConcepts.map((concept) => ({ params: { id: concept.id }, props: { concept } }));
+}
+
+interface Props { concept: KnowledgeConcept; }
+const { concept } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const typeLabel = concept.type === 'Fund' ? 'ETF·ETP' : concept.type === 'Financial Concept' ? '초보자 용어' : '검증 가능한 계산 방법';
+---
+<BaseLayout title={`${concept.title} | 마켓 렌즈 지식 위키`} description={concept.description}>
+  <header class="site-header shell"><a class="brand" href={`${base}/`}><img class="brand-logo" src={`${base}/favicon.png`} width="34" height="34" alt="" />마켓 렌즈</a><nav class="top-nav"><a href={withBase('/wiki/')}>지식 위키</a><span>OKF 개념</span></nav></header>
+  <main id="main-content" class="shell knowledge-detail concept-detail">
+    <header class="knowledge-title"><p class="eyebrow">{typeLabel}</p><h1>{concept.title}</h1><p>{concept.description}</p><div><span>{trustLabel(concept.trust)}</span><span>상태: {concept.status}</span><a href={okfSourceHref(concept)}>OKF 원문</a></div></header>
+    {concept.type === 'Fund' && concept.latestObservation ? <section class="concept-panel"><h2>최근 관찰</h2><dl><div><dt>기준일</dt><dd>{concept.latestObservation.marketDate}</dd></div><div><dt>종가</dt><dd>${formatNumber(concept.latestObservation.close)}</dd></div><div><dt>등락률</dt><dd class={concept.latestObservation.changePct >= 0 ? 'up' : 'down'}>{formatPct(concept.latestObservation.changePct)}</dd></div></dl><p>최근 가격은 장기 성과나 상품 적합성을 뜻하지 않습니다. 지수, 총보수, 유동성, 분배 정책은 운용사 공식자료에서 다시 확인해야 합니다.</p></section> : null}
+    {concept.type === 'Financial Concept' ? <section class="concept-panel"><h2>왜 알아야 하나요?</h2><p>{concept.description}. 하나의 지표만으로 방향을 단정하지 않고 가격·거래량·출처를 함께 읽기 위한 기본 개념입니다.</p></section> : null}
+    {concept.type === 'Attested Computation' ? <section class="concept-panel"><h2>어떻게 검증하나요?</h2><p>수치는 LLM이 계산하지 않습니다. 저장소의 Python 계산 코드가 생성하고 회귀 테스트와 발행 검증기가 같은 입력에서 결과를 다시 확인합니다.</p><a href="https://github.com/euisuk-chung/Stocks-tracker/tree/main/pipeline" target="_blank" rel="noreferrer">계산 코드와 테스트 보기 →</a></section> : null}
+    <aside class="wiki-boundary"><strong>지식의 출처</strong><p>이 화면은 OKF 개념의 요약입니다. 전체 frontmatter, 검증 주체, 원본 경로는 OKF 원문에서 확인할 수 있습니다.</p></aside>
+  </main>
+</BaseLayout>

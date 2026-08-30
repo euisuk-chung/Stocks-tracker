@@ -30,7 +30,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p site/src/data/reports site/public/data/reports
+          mkdir -p site/src/data/reports site/public/data/reports site/src/data/knowledge site/public/data/knowledge
 
           if git ls-remote --exit-code --heads origin reports >/dev/null 2>&1; then
             git fetch --quiet --depth=1 origin reports
@@ -45,6 +45,11 @@ jobs:
             if [[ -f "${RUNNER_TEMP}/reports-branch/index.json" ]]; then
               cp "${RUNNER_TEMP}/reports-branch/index.json" site/src/data/reports/index.json
               cp "${RUNNER_TEMP}/reports-branch/index.json" site/public/data/reports/index.json
+            fi
+
+            if [[ -d "${RUNNER_TEMP}/reports-branch/knowledge" ]]; then
+              cp -R "${RUNNER_TEMP}/reports-branch/knowledge/." site/src/data/knowledge/
+              cp -R "${RUNNER_TEMP}/reports-branch/knowledge/." site/public/data/knowledge/
             fi
           else
             echo 'The reports branch does not exist yet; building the site without generated reports.'

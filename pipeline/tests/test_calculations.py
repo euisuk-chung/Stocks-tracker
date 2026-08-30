@@ -37,6 +37,7 @@ def test_indicator_values_use_prior_twenty_sessions_for_volume_baseline() -> Non
     assert security.average_volume_20 == round(expected_average, 2)
     assert security.volume_ratio_20 == round(bars[-1].volume / expected_average, 4)
     assert security.sma20 == round(sum(bar.close for bar in bars[-20:]) / 20, 4)
+    assert security.sma40 == round(sum(bar.close for bar in bars[-40:]) / 40, 4)
     assert len(security.history) == 70
 
 
@@ -57,6 +58,12 @@ def test_json_contract_uses_camel_case_and_publish_gate() -> None:
         "blog_quality_reviewer": "pass",
         "humanify_reviewer": "pass",
     }
+    assert {item["role"] for item in payload["leadStory"]["supportingPoints"]} == {
+        "market",
+        "sector",
+        "catalyst",
+    }
+    assert 1 <= len(payload["nextWatch"]) <= 3
     assert "market_date" not in payload["metadata"]
 
 
